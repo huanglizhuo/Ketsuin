@@ -7,6 +7,7 @@ import { T9EditorDisplay } from './components/T9EditorDisplay';
 import { T9Keyboard } from './components/T9Keyboard';
 import { SignManager } from './core/SignManager';
 import { T9Engine } from './core/T9Engine';
+import { SignOverlay } from './components/SignOverlay';
 
 const signManager = new SignManager();
 
@@ -17,9 +18,16 @@ function App() {
   const t9EngineRef = useRef(new T9Engine());
   const [t9State, setT9State] = useState(t9EngineRef.current.getState());
 
+  // Visual Overlay State
+  const [lastConfirmedSign, setLastConfirmedSign] = useState<number | null>(null);
+
   // Delete Hold Tracking
   const deleteHoldStartRef = useRef<number | null>(null);
   const nextDeleteTimeRef = useRef<number>(0);
+
+  // Cycle Hold Tracking
+  const cycleHoldStartRef = useRef<number | null>(null);
+  const nextCycleTimeRef = useRef<number>(0);
 
   // Unified Processing Effect
   useEffect(() => {
@@ -33,20 +41,24 @@ function App() {
       events.forEach(event => {
         if (event.type === 'SIGN') {
           const newSignId = event.data;
+
+          // Update Overlay
+          setLastConfirmedSign(newSignId);
+
           t9EngineRef.current.handleInput(newSignId);
           setT9State(t9EngineRef.current.getState());
         }
       });
 
-      // --- Continuous Delete Logic ---
-      // Sign 10 (Bird) is Delete
+      const now = Date.now();
+
+      // --- Continuous Delete Logic (Sign 10) ---
       if (signId === 10) {
-        const now = Date.now();
         if (deleteHoldStartRef.current === null) {
           deleteHoldStartRef.current = now;
         } else {
           const holdDuration = now - deleteHoldStartRef.current;
-          if (holdDuration > 1000) { // 1 seconds threshold
+          if (holdDuration > 1000) { // 1s threshold
             if (now >= nextDeleteTimeRef.current) {
               t9EngineRef.current.handleInput(10); // Trigger Backspace
               setT9State(t9EngineRef.current.getState());
@@ -54,14 +66,36 @@ function App() {
             }
           }
         }
+        // Reset other hold refs if this one is active
+        cycleHoldStartRef.current = null;
       } else {
-        // Reset if not holding delete
         deleteHoldStartRef.current = null;
+      }
+
+      // --- Continuous Cycle Logic (Sign 12) ---
+      if (signId === 12) {
+        if (cycleHoldStartRef.current === null) {
+          cycleHoldStartRef.current = now;
+        } else {
+          const holdDuration = now - cycleHoldStartRef.current;
+          if (holdDuration > 1000) { // 1s threshold
+            if (now >= nextCycleTimeRef.current) {
+              t9EngineRef.current.handleInput(12); // Cycle Candidate
+              setT9State(t9EngineRef.current.getState());
+              nextCycleTimeRef.current = now + 300; // 300ms interval
+            }
+          }
+        }
+        // Reset other hold refs if this one is active
+        deleteHoldStartRef.current = null;
+      } else {
+        cycleHoldStartRef.current = null;
       }
 
     } else {
       // No detections
       deleteHoldStartRef.current = null;
+      cycleHoldStartRef.current = null;
       signManager.resetStability();
 
       if (signManager.checkTimeout()) {
@@ -81,6 +115,9 @@ function App() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80"></div>
       </div>
+
+      {/* Sekiro-Style Overlay */}
+      <SignOverlay currentSign={lastConfirmedSign} />
 
       {/* Header */}
       <Header

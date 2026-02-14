@@ -19,6 +19,7 @@ Powered by a **YOLOX-Nano** neural network running on **ONNX Runtime Web**, this
 -   **Reverse Mapping**: Type manually to see the corresponding hand seal sequence dynamically displayed.
 -   **Mobile Optimized**: Fully responsive layout that works on desktop and mobile devices.
 -   **Continuous Delete**: Hold the "酉" sign to rapidly delete text.
+-   **Continuous Cycle**: Hold the "Boar" sign to rapidly cycle through candidates (300ms interval).
 -   **Anti-Misinput**: Intelligent stability delays (100ms for general keys, 40ms for Space) to prevent accidental clicks.
 
 ## How to Use
