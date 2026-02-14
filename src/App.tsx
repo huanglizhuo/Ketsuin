@@ -11,7 +11,7 @@ import { T9Engine } from './core/T9Engine';
 const signManager = new SignManager();
 
 function App() {
-  const { loading, isRunning, start, stop, detections, videoRef } = useDetector('model/yolox_nano.onnx');
+  const { loading, isRunning, start, stop, detections, videoRef, error } = useDetector('model/yolox_nano.onnx');
 
   // T9 Engine State
   const t9EngineRef = useRef(new T9Engine());
@@ -85,6 +85,7 @@ function App() {
       <Header
         loading={loading}
         isRunning={isRunning}
+        error={error}
         start={start}
         stop={stop}
       />

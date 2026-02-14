@@ -8,6 +8,7 @@ export function useDetector(modelPath: string) {
     const [loading, setLoading] = useState(true);
     const [isRunning, setIsRunning] = useState(false);
     const [detections, setDetections] = useState<Detection[]>([]);
+    const [error, setError] = useState<string | null>(null);
     const detectorRef = useRef<YoloxDetector | null>(null);
     const animationFrameRef = useRef<number>(0);
     const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -21,7 +22,7 @@ export function useDetector(modelPath: string) {
                 setLoading(false);
             } catch (e) {
                 console.error("Initialization failed", e);
-                // Retry or state error?
+                setError("Failed to load AI Model. Please refresh.");
             }
         };
         init();
@@ -52,6 +53,8 @@ export function useDetector(modelPath: string) {
     const start = useCallback(() => {
         if (!videoRef.current) return;
 
+        setError(null);
+
         navigator.mediaDevices.getUserMedia({
             video: { width: { ideal: 640 }, height: { ideal: 480 } }
         }).then(stream => {
@@ -60,8 +63,17 @@ export function useDetector(modelPath: string) {
                 videoRef.current.play();
                 setIsRunning(true);
             }
-        }).catch(err => {
-            console.error("Camera access denied", err);
+        }).catch((err: any) => {
+            console.error("Camera access denied/failed", err);
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                setError("🚫 Permission Denied. Please allow camera access.");
+            } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                setError("📷 No Camera Found. Please connect a webcam.");
+            } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+                setError("⚠️ Camera In Use. Please close other apps.");
+            } else {
+                setError(`⚠️ Camera Error: ${err.name || err.message || 'Unknown'}`);
+            }
         });
     }, []);
 
@@ -84,5 +96,5 @@ export function useDetector(modelPath: string) {
         }
     }, [isRunning, loop]);
 
-    return { loading, isRunning, start, stop, detections, videoRef };
+    return { loading, isRunning, start, stop, detections, videoRef, error };
 }

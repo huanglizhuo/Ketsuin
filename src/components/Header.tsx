@@ -3,11 +3,12 @@ import React from 'react';
 interface HeaderProps {
     loading: boolean;
     isRunning: boolean;
+    error: string | null;
     start: () => void;
     stop: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ loading, isRunning, start, stop }) => {
+export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start, stop }) => {
     const [showTooltip, setShowTooltip] = React.useState(false);
 
     React.useEffect(() => {
@@ -44,13 +45,20 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, start, stop 
                     className={`
                     px-6 py-2 bg-gray-800 border-2 rounded font-bold tracking-widest uppercase transition-all duration-300 relative
                     ${showTooltip ? 'z-50 shadow-[0_0_30px_rgba(242,169,0,0.6)] scale-110' : ''}
-                    ${loading ? 'cursor-wait opacity-50 border-gray-600' : ''}
-                    ${!loading && isRunning
-                            ? 'border-akatsuki-red text-akatsuki-red hover:bg-akatsuki-red hover:text-white shadow-[0_0_15px_#980000]'
-                            : 'border-konoha-orange text-konoha-orange hover:bg-konoha-orange hover:text-black shadow-[0_0_15px_#F2A900]'}
+                    ${error
+                            ? 'border-red-500 text-red-500 hover:bg-red-500/10 cursor-pointer shadow-[0_0_15px_#ff0000]'
+                            : loading
+                                ? 'cursor-wait opacity-50 border-gray-600'
+                                : isRunning
+                                    ? 'border-akatsuki-red text-akatsuki-red hover:bg-akatsuki-red hover:text-white shadow-[0_0_15px_#980000]'
+                                    : 'border-konoha-orange text-konoha-orange hover:bg-konoha-orange hover:text-black shadow-[0_0_15px_#F2A900]'}
                 `}
                 >
-                    {loading ? 'Gathering Chakra...' : isRunning ? 'Release Jutsu' : '結印 Start'}
+                    {error ? (
+                        <span className="flex items-center gap-2 text-xs md:text-sm whitespace-nowrap">
+                            <span className="text-lg">🚫</span> {error}
+                        </span>
+                    ) : loading ? 'Gathering Chakra...' : isRunning ? 'Release Jutsu' : '結印 Start'}
 
                     {/* Tooltip for first-time users */}
                     {showTooltip && !loading && !isRunning && (
