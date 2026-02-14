@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useDetector } from './hooks/useDetector';
 import { VideoFeed } from './components/VideoFeed';
 import { Header } from './components/Header';
@@ -183,6 +184,7 @@ function App() {
 
       </main>
       <Analytics />
+      <SpeedInsights />
     </div>
   );
 }
