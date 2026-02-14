@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "Type with Ninja Hand Signs! A webcam-based input method using computer vision and T9 predictive text.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

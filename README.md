@@ -6,7 +6,7 @@
 
 [中文文档](README_zh.md)
 
-**Ketsuin** invokes the ancient art of **Ninjutsu** to manipulate the digital realm. Forget your physical keyboard; channel your chakra and weave the **12 Hand Signs** (based on Naruto seals) to conjure text.
+**Ketsuin** invokes the ancient art of **Ninjutsu** to manipulate the digital realm. Forget your physical keyboard， channel your chakra and weave the **12 Hand Signs** (based on Naruto seals) to conjure text.
 
 Powered by a **YOLOX-Nano** neural network running on **ONNX Runtime Web**, this project transforms your webcam into a Shinobi tool, detecting hand seals in real-time and forging them into words through a strict **T9 Engine**.
 
@@ -57,20 +57,13 @@ The input method uses the 12 hand signs (Rat, Ox, Tiger, etc.) mapped to the key
 -   Node.js
 -   npm
 
-### Setup
+### how to run local
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Deployment
-
-This project is static and runs entirely in the browser (Client-Side), so it is **perfect for the Vercel Hobby (Free) Tier**.
--   **No Backend Costs**: The AI model runs on your device.
--   **Bandwidth**: The only usage is downloading the model (~Megabytes).
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhuanglizhuo%2FKetsuin)
 
 ### Tech Stack
 

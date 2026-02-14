@@ -56,20 +56,12 @@
 -   Node.js
 -   npm
 
-### 安装与运行
+### 本地运行
 
 ```bash
 npm install
 npm run dev
 ```
-
-## 部署 (Deployment)
-
-本项目是纯前端静态应用，AI 推理完全在浏览器端（客户端）运行，因此**Vercel 免费版 (Hobby Tier) 完全足够**。
--   **零后端成本**: 模型在用户设备上运行，不消耗服务器计算资源。
--   **带宽**: 仅在首次加载时下载模型和网页资源。
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhuanglizhuo%2FKetsuin)
 
 ### 技术栈
 
