@@ -10,7 +10,10 @@
 
 凝聚查克拉，结出十二地支之印，像真正的忍者一样将意念转化为文字。该项目基于 **ONNX Runtime Web** 驱动的神经网络，实时捕捉你的每一个手势，将摄像头化身为通灵之术的媒介。
 
-![Ketsuin Demo](public/asset/demo.gif)
+<p align="center">
+  <img src="public/asset/demo.gif" alt="Ketsuin Demo 1" width="45%" />
+  <img src="public/asset/output2.gif" alt="Ketsuin Demo 2" width="45%" />
+</p>
 
 ## 功能特性
 

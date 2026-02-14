@@ -10,7 +10,10 @@
 
 Powered by a **YOLOX-Nano** neural network running on **ONNX Runtime Web**, this project transforms your webcam into a Shinobi tool, detecting hand seals in real-time and forging them into words through a strict **T9 Engine**.
 
-![Ketsuin Demo](public/asset/demo.gif)
+<p align="center">
+  <img src="public/asset/demo.gif" alt="Ketsuin Demo 1" width="45%" />
+  <img src="public/asset/output2.gif" alt="Ketsuin Demo 2" width="45%" />
+</p>
 
 ## Features
 
