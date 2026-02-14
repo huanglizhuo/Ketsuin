@@ -47,11 +47,9 @@ export class T9Engine {
                 continue;
             }
             // Find key for char
-            let found = false;
             for (let k = 1; k <= 9; k++) {
                 if (T9_MAP[k].includes(char)) {
                     signs.push(k);
-                    found = true;
                     break;
                 }
             }
