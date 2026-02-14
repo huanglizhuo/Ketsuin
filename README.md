@@ -64,6 +64,14 @@ npm install
 npm run dev
 ```
 
+## Deployment
+
+This project is static and runs entirely in the browser (Client-Side), so it is **perfect for the Vercel Hobby (Free) Tier**.
+-   **No Backend Costs**: The AI model runs on your device.
+-   **Bandwidth**: The only usage is downloading the model (~Megabytes).
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhuanglizhuo%2FKetsuin)
+
 ### Tech Stack
 
 -   **React + TypeScript + Vite**: Frontend framework.
