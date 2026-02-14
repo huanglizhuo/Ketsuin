@@ -9,8 +9,12 @@ export class SignManager {
     private displayQueue: number[] = [];
     private historyQueue: number[] = [];
     private signSequence: number[] = []; // For key combos
-    private chatteringQueue: number[] = [];
-    private chatteringSize = CONFIG.CHATTERING_CHECK;
+
+    // Stability / Hold Logic
+    private pendingSign: number | null = null;
+    private pendingStartTime: number = 0;
+    private pendingEmitted: boolean = false;
+    private readonly SIGN_HOLD_MS = 100;
 
     private lastSignTime = 0;
 
@@ -18,49 +22,60 @@ export class SignManager {
         this.displayQueue = [];
         this.historyQueue = [];
         this.signSequence = [];
-        this.chatteringQueue = [];
     }
 
     process(classId: number): SignEvent[] {
         const events: SignEvent[] = [];
-        // classId from detector is 0-based.
-        // Map to 1-based ID:
-        const signId = classId + 1;
+        const signId = classId + 1; // 0-based to 1-based
 
-        // Chattering check
-        this.chatteringQueue.push(signId);
-        if (this.chatteringQueue.length > this.chatteringSize) {
-            this.chatteringQueue.shift();
+        // Check if sign changed
+        if (signId !== this.pendingSign) {
+            this.pendingSign = signId;
+            this.pendingStartTime = Date.now();
+            this.pendingEmitted = false;
+            return events; // wait for stability
         }
 
-        // Only proceed if queue is full and all values are same
-        if (this.chatteringQueue.length < this.chatteringSize) return events;
-        const allSame = this.chatteringQueue.every(v => v === this.chatteringQueue[0]);
-        if (!allSame) return events;
+        // Sign matches pending, check duration
+        if (!this.pendingEmitted) {
+            const duration = Date.now() - this.pendingStartTime;
 
-        const stableSign = this.chatteringQueue[0];
+            // Special threshold for Space (Sign 11)
+            const threshold = (signId === 11) ? 40 : this.SIGN_HOLD_MS;
 
-        // Check if new sign
-        const lastDisplayed = this.displayQueue.length > 0 ? this.displayQueue[this.displayQueue.length - 1] : -1;
+            if (duration >= threshold) {
+                // COMMIT SIGN
+                this.pendingEmitted = true;
 
-        if (lastDisplayed !== stableSign) {
-            this.displayQueue.push(stableSign);
-            this.historyQueue.push(stableSign);
-            this.signSequence.push(stableSign);
+                // Logic moved from old chattering block:
+                const stableSign = signId;
+                const lastDisplayed = this.displayQueue.length > 0 ? this.displayQueue[this.displayQueue.length - 1] : -1;
 
-            if (this.displayQueue.length > CONFIG.MAX_DISPLAY) this.displayQueue.shift();
-            if (this.historyQueue.length > CONFIG.MAX_HISTORY) this.historyQueue.shift();
+                if (lastDisplayed !== stableSign) {
+                    this.displayQueue.push(stableSign);
+                    this.historyQueue.push(stableSign);
+                    this.signSequence.push(stableSign);
 
-            this.lastSignTime = Date.now();
+                    if (this.displayQueue.length > CONFIG.MAX_DISPLAY) this.displayQueue.shift();
+                    if (this.historyQueue.length > CONFIG.MAX_HISTORY) this.historyQueue.shift();
 
-            events.push({ type: 'SIGN', data: stableSign });
+                    this.lastSignTime = Date.now();
 
-            // Check Mappings
-            const mappingEvents = this.checkMappings();
-            events.push(...mappingEvents);
+                    events.push({ type: 'SIGN', data: stableSign });
+
+                    // Check Mappings
+                    const mappingEvents = this.checkMappings();
+                    events.push(...mappingEvents);
+                }
+            }
         }
 
         return events;
+    }
+
+    resetStability() {
+        this.pendingSign = null;
+        this.pendingEmitted = false;
     }
 
     checkMappings(): SignEvent[] {

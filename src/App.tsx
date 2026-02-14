@@ -46,7 +46,7 @@ function App() {
           deleteHoldStartRef.current = now;
         } else {
           const holdDuration = now - deleteHoldStartRef.current;
-          if (holdDuration > 2000) { // 2 seconds threshold
+          if (holdDuration > 1000) { // 1 seconds threshold
             if (now >= nextDeleteTimeRef.current) {
               t9EngineRef.current.handleInput(10); // Trigger Backspace
               setT9State(t9EngineRef.current.getState());
@@ -62,6 +62,7 @@ function App() {
     } else {
       // No detections
       deleteHoldStartRef.current = null;
+      signManager.resetStability();
 
       if (signManager.checkTimeout()) {
         // Optional: Clear T9 sequence on timeout? 
