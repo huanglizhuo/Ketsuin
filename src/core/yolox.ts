@@ -11,21 +11,58 @@ export class YoloxDetector {
     private session: ort.InferenceSession | null = null;
     private inputShape = CONFIG.INPUT_SHAPE;
 
+    // Performance Optimization: Cache these
+    private preprocessCanvas: HTMLCanvasElement;
+    private preprocessCtx: CanvasRenderingContext2D;
+    private grids: number[][] | null = null;
+    private expandedStrides: number[] | null = null;
+
+    constructor() {
+        this.preprocessCanvas = document.createElement('canvas');
+        this.preprocessCanvas.width = this.inputShape;
+        this.preprocessCanvas.height = this.inputShape;
+        this.preprocessCtx = this.preprocessCanvas.getContext('2d', { willReadFrequently: true })!;
+    }
+
     async load(modelPath: string) {
         try {
             // Configure WASM paths to serve from /onnx/ directory
             // Use window.location.origin to make it an absolute URL, bypassing Vite's "public file import" check
             ort.env.wasm.wasmPaths = window.location.origin + '/onnx/';
 
-            // Set to use wasm, maybe webgl if supported, but wasm is safer for compatibility initially
-            // ensuring we can load local file
+            // Set to use wasm
             this.session = await ort.InferenceSession.create(modelPath, {
-                executionProviders: ['wasm'], // 'webgl' can be faster but sometimes issues on specific GPUs with specific ops
+                executionProviders: ['wasm'],
             });
             console.log('Model loaded successfully');
+
+            // Precompute grids
+            this.generateGrids();
+
         } catch (e) {
             console.error('Failed to load model', e);
             throw e;
+        }
+    }
+
+    private generateGrids() {
+        const stride = [8, 16, 32];
+        this.grids = [];
+        this.expandedStrides = [];
+
+        const hsizes = stride.map(s => Math.floor(this.inputShape / s));
+        const wsizes = stride.map(s => Math.floor(this.inputShape / s));
+
+        for (let i = 0; i < stride.length; i++) {
+            const s = stride[i];
+            const h = hsizes[i];
+            const w = wsizes[i];
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    this.grids.push([x, y]);
+                    this.expandedStrides.push(s);
+                }
+            }
         }
     }
 
@@ -45,11 +82,11 @@ export class YoloxDetector {
     }
 
     private async preprocess(image: HTMLVideoElement | HTMLImageElement | HTMLCanvasElement) {
-        const hiddenCanvas = document.createElement('canvas');
-        hiddenCanvas.width = this.inputShape;
-        hiddenCanvas.height = this.inputShape;
-        const ctx = hiddenCanvas.getContext('2d');
+        const ctx = this.preprocessCtx;
         if (!ctx) throw new Error('Could not get context');
+
+        // Clear canvas
+        ctx.clearRect(0, 0, this.inputShape, this.inputShape);
 
         // Letterbox logic
         const w = image instanceof HTMLVideoElement ? image.videoWidth : image.width;
@@ -67,7 +104,7 @@ export class YoloxDetector {
         ctx.drawImage(image, 0, 0, nw, nh);
 
         const imageData = ctx.getImageData(0, 0, this.inputShape, this.inputShape);
-        const { data } = imageData;
+        const { data } = imageData; // this is now optimized due to willReadFrequently: true
 
         const input = new Float32Array(3 * this.inputShape * this.inputShape);
 
@@ -87,31 +124,18 @@ export class YoloxDetector {
     }
 
     private postprocess(output: ort.Tensor, padParams: { scale: number, nw: number, nh: number }): Detection[] {
-        const predictions = output.data as Float32Array; // Shape [1, 8400, 85] ? 
+        const predictions = output.data as Float32Array;
 
-        const stride = [8, 16, 32]; // Nano uses 3 strides
-        // Grid generation
-        const grids: number[][] = [];
-        const expandedStrides: number[] = [];
-
-        const hsizes = stride.map(s => Math.floor(this.inputShape / s));
-        const wsizes = stride.map(s => Math.floor(this.inputShape / s));
-
-        // We can precompute grids if we want optimization, but run-time is fine for now
-        for (let i = 0; i < stride.length; i++) {
-            const s = stride[i];
-            const h = hsizes[i];
-            const w = wsizes[i];
-            for (let y = 0; y < h; y++) {
-                for (let x = 0; x < w; x++) {
-                    grids.push([x, y]);
-                    expandedStrides.push(s);
-                }
-            }
+        if (!this.grids || !this.expandedStrides) {
+            console.error("Grids not initialized, running generateGrids fallback");
+            this.generateGrids();
         }
 
+        const grids = this.grids!;
+        const expandedStrides = this.expandedStrides!;
+
         // Output shape: [1, N, 5 + NumClasses]
-        const numAnchors = 3549; // For 416 input
+        const numAnchors = grids.length; // Should be 3549
         const numCols = predictions.length / numAnchors;
         const detections: Detection[] = [];
 

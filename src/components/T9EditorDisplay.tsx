@@ -22,18 +22,85 @@ export const T9EditorDisplay: React.FC<T9InputState> = ({
     onTextChange,
     fullSignSequence = []
 }) => {
+    const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+    const mirrorRef = React.useRef<HTMLDivElement>(null);
+    const [selectionEnd, setSelectionEnd] = React.useState(0);
+
+    // Sync Scroll
+    const handleScroll = () => {
+        if (textareaRef.current && mirrorRef.current) {
+            mirrorRef.current.scrollTop = textareaRef.current.scrollTop;
+        }
+    };
+
+    // Update cursor position on select/click/keyup
+    const updateCursor = () => {
+        if (textareaRef.current) {
+            setSelectionEnd(textareaRef.current.selectionEnd);
+        }
+    };
+
+    // Auto-scroll to bottom if text changes (optional, but good for T9)
+    React.useEffect(() => {
+        if (textareaRef.current) {
+            setSelectionEnd(textareaRef.current.textLength); // Keep cursor at end for T9 usually
+            // If we want to strictly follow user interactions, we might not want this.
+            // But for manual typing, updateCursor handles it.
+        }
+    }, [committedText]); // dependency on text
+
+    // Cursor Element
+    const Cursor = () => (
+        <span className="inline-block w-[2px] h-[1.2em] bg-konoha-orange align-text-bottom animate-pulse -mb-[2px]"></span>
+    );
+
     return (
         <div className="bg-black/30 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden shadow-lg flex flex-col h-full min-h-[200px]">
-            {/* Committed Text (Editable) */}
-            <textarea
-                className="flex-[2] p-4 font-mono text-gray-200 text-lg bg-transparent resize-none focus:outline-none focus:ring-1 focus:ring-konoha-orange/50 border-b border-white/10 placeholder-gray-500"
-                value={committedText}
-                onChange={(e) => onTextChange?.(e.target.value)}
-                placeholder="Type here or use hand signs..."
-            />
+            {/* Editor Container */}
+            <div className="relative flex-[2] w-full h-full overflow-hidden">
+
+                {/* Mirror Display (Background) */}
+                <div
+                    ref={mirrorRef}
+                    className="absolute inset-0 p-4 font-mono text-lg bg-transparent break-words whitespace-pre-wrap overflow-y-auto pointer-events-none"
+                    style={{ fontFamily: 'var(--font-mono)' }} // Ensure exact match
+                >
+                    {/* Render text with cursor */}
+                    <span className="text-gray-200">{committedText.slice(0, selectionEnd)}</span>
+                    <Cursor />
+                    <span className="text-gray-200">{committedText.slice(selectionEnd)}</span>
+                    {/* Extra newline to ensure cursor shows at end of line */}
+                    {committedText.endsWith('\n') && <br />}
+                </div>
+
+                {/* Actual Input (Foreground, Invisible Text) */}
+                <textarea
+                    ref={textareaRef}
+                    className="absolute inset-0 w-full h-full p-4 font-mono text-lg bg-transparent resize-none border-none outline-none text-transparent caret-transparent overflow-y-auto"
+                    value={committedText}
+                    onChange={(e) => {
+                        onTextChange?.(e.target.value);
+                        updateCursor();
+                    }}
+                    onSelect={updateCursor}
+                    onClick={updateCursor}
+                    onKeyUp={updateCursor}
+                    onScroll={handleScroll}
+                    placeholder=""
+                    spellCheck={false}
+                    style={{ fontFamily: 'var(--font-mono)' }}
+                />
+
+                {/* Placeholder (Only if empty) */}
+                {committedText.length === 0 && (
+                    <div className="absolute inset-0 p-4 font-mono text-lg text-gray-500 pointer-events-none">
+                        Type here or use hand signs...
+                    </div>
+                )}
+            </div>
 
             {/* Gesture Input List (Reverse Mapped) */}
-            <div className="flex-1 bg-black/20 p-2 overflow-x-auto flex items-center gap-2 border-b border-white/10 min-h-[60px]">
+            <div className="flex-1 bg-black/20 p-2 overflow-x-auto flex items-center gap-2 border-b border-t border-white/10 min-h-[60px] shrink-0">
                 <span className="text-xs text-gray-500 font-mono shrink-0 uppercase tracking-widest mr-2">Seals:</span>
                 {fullSignSequence.map((signId, i) => {
                     const sign = HAND_SIGNS.find(s => s.id === signId);

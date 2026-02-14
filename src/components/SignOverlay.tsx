@@ -49,7 +49,7 @@ export const SignOverlay: React.FC<SignOverlayProps> = ({ currentSign }) => {
                     transition-all duration-700 ease-out
                     ${animate
                         ? 'opacity-0 scale-[1.5] translate-z-0' // End state (fading out, large)
-                        : 'opacity-100 scale-50' // Start state (visible, small)
+                        : 'opacity-0 scale-50' // Start state (hidden, small)
                     }
                 `}
                 style={{

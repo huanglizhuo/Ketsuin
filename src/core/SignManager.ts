@@ -14,7 +14,8 @@ export class SignManager {
     private pendingSign: number | null = null;
     private pendingStartTime: number = 0;
     private pendingEmitted: boolean = false;
-    private readonly SIGN_HOLD_MS = 100;
+    public static readonly SIGN_HOLD_MS = 100;
+    public static readonly SPACE_HOLD_MS = 40;
 
     private lastSignTime = 0;
 
@@ -41,7 +42,7 @@ export class SignManager {
             const duration = Date.now() - this.pendingStartTime;
 
             // Special threshold for Space (Sign 11)
-            const threshold = (signId === 11) ? 40 : this.SIGN_HOLD_MS;
+            const threshold = (signId === 11) ? SignManager.SPACE_HOLD_MS : SignManager.SIGN_HOLD_MS;
 
             if (duration >= threshold) {
                 // COMMIT SIGN

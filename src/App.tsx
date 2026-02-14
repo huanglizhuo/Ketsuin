@@ -53,15 +53,19 @@ function App() {
       const now = Date.now();
 
       // --- Continuous Delete Logic (Sign 10) ---
+      // --- Continuous Delete Logic (Sign 10) ---
       if (signId === 10) {
         if (deleteHoldStartRef.current === null) {
           deleteHoldStartRef.current = now;
         } else {
           const holdDuration = now - deleteHoldStartRef.current;
-          if (holdDuration > 1000) { // 1s threshold
+          // Use a similar threshold to SignManager stability (plus a buffer) or just the same
+          // User requested "similar SIGN_HOLD_MS", so we use the constant
+          if (holdDuration > SignManager.SIGN_HOLD_MS * 3) { // 300ms hold start
             if (now >= nextDeleteTimeRef.current) {
               t9EngineRef.current.handleInput(10); // Trigger Backspace
               setT9State(t9EngineRef.current.getState());
+              setLastConfirmedSign(10); // Trigger Overlay
               nextDeleteTimeRef.current = now + 100; // 100ms interval
             }
           }
@@ -78,10 +82,11 @@ function App() {
           cycleHoldStartRef.current = now;
         } else {
           const holdDuration = now - cycleHoldStartRef.current;
-          if (holdDuration > 1000) { // 1s threshold
+          if (holdDuration > SignManager.SIGN_HOLD_MS * 3) { // 300ms hold start
             if (now >= nextCycleTimeRef.current) {
               t9EngineRef.current.handleInput(12); // Cycle Candidate
               setT9State(t9EngineRef.current.getState());
+              setLastConfirmedSign(12); // Trigger Overlay
               nextCycleTimeRef.current = now + 300; // 300ms interval
             }
           }
