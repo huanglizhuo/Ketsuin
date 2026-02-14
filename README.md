@@ -6,7 +6,9 @@
 
 [中文文档](README_zh.md)
 
-**Ketsuin** is an experimental input method that replaces the traditional keyboard with **Ninja Hand Signs** (based on Naruto seals). It utilizes computer vision to detect hand gestures in real-time and maps them to a T9 predictive text system.
+**Ketsuin** invokes the ancient art of **Ninjutsu** to manipulate the digital realm. Forget your physical keyboard; channel your chakra and weave the **12 Hand Signs** (based on Naruto seals) to conjure text.
+
+Powered by a **YOLOX-Nano** neural network running on **ONNX Runtime Web**, this project transforms your webcam into a Shinobi tool, detecting hand seals in real-time and forging them into words through a strict **T9 Engine**.
 
 ![Ketsuin Demo](public/asset/demo.gif)
 
@@ -14,14 +16,13 @@
 
 -   **Hand Sign Detection**: Uses a lightweight YOLOX-Nano model via ONNX Runtime to detect 12 distinct hand signs.
 -   **T9 Ninja Engine**: Implements a strict T9 input system where each hand sign corresponds to a key on a traditional phone keypad.
--   **Predictive Text**: Suggests words based on the input sequence using a built-in dictionary.
 -   **Reverse Mapping**: Type manually to see the corresponding hand seal sequence dynamically displayed.
 -   **Mobile Optimized**: Fully responsive layout that works on desktop and mobile devices.
--   **Continuous Delete**: Hold the "Bird" sign to rapidly delete text.
+-   **Continuous Delete**: Hold the "酉" sign to rapidly delete text.
 
 ## How to Use
 
-### The 12 Signs of the Zodiac
+### The 12 Signs
 
 The input method uses the 12 hand signs (Rat, Ox, Tiger, etc.) mapped to the keys 1-9, *, 0, #.
 
