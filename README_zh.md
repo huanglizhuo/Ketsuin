@@ -1,10 +1,12 @@
+<p align="center">
+  <img src="public/asset/ketsuin.png" alt="Ketsuin Logo" width="200" />
+</p>
+
 # 结印 Ketsuin - 忍者手势输入法
 
 [English Documentation](README.md)
 
 **Ketsuin (结印)** 是一种实验性的输入法，它使用**忍者手势**（基于火影忍者中的结印）代替传统键盘。它利用计算机视觉实时检测手势，并将其映射到 T9 预测文本系统。
-
-![Ketsuin Screenshot](public/asset/shinra.png)
 
 ## 功能特性
 

@@ -118,7 +118,7 @@ function App() {
                 <h3 className="text-x text-gray-400 font-mono text-center mb-2 uppercase tracking-widest text-shadow">Ninja Keypad</h3>
                 <T9Keyboard activeSignId={detections.length > 0 ? detections[0].classId + 1 : null} />
                 <div className="text-center text-gray-400 text-[20px] font-mono mt-2 text-shadow">
-                  戌(0)=Space | 亥(1)=Next | 酉(*)=Del
+                  戌=Space | 亥=Next | 酉=Del
                 </div>
               </div>
             </div>

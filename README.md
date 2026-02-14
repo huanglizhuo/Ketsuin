@@ -1,10 +1,12 @@
+<p align="center">
+  <img src="public/asset/ketsuin.png" alt="Ketsuin Logo" width="200" />
+</p>
+
 # 结印 Ketsuin - Ninja Hand Sign Input
 
 [中文文档](README_zh.md)
 
 **Ketsuin** is an experimental input method that replaces the traditional keyboard with **Ninja Hand Signs** (based on Naruto seals). It utilizes computer vision to detect hand gestures in real-time and maps them to a T9 predictive text system.
-
-![Ketsuin Screenshot](public/asset/shinra.png)
 
 ## Features
 
