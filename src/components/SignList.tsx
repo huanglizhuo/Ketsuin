@@ -43,7 +43,7 @@ export const SignList: React.FC<SignListProps> = ({ signs, title, className, mob
                         />
                     </div>
                     <span className="text-gray-400 group-hover:text-konoha-orange font-mono text-xl md:text-2xl">{sign.name}</span>
-                    <span className="text-2xl text-konoha-orange font-bold drop-shadow-[0_0_5px_rgba(242,169,0,0.8)]">{sign.kanji}</span>
+                    <span className="text-3xl text-konoha-orange font-bold drop-shadow-[0_0_5px_rgba(242,169,0,0.8)]">{sign.kanji}</span>
                 </div>
             ))}
         </div>
