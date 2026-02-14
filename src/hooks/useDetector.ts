@@ -4,8 +4,12 @@ import type { Detection } from '../core/yolox';
 
 export type { Detection };
 
-export function useDetector(modelPath: string) {
-    const [loading, setLoading] = useState(true);
+// Updated implementation
+export function useDetector(
+    // Default to GitHub Pages CDN to save Vercel bandwidth
+    modelPath: string = 'https://huanglizhuo.github.io/Ketsuin/model/yolox_nano.onnx'
+) {
+    const [loading, setLoading] = useState(false); // Not loading initially
     const [isRunning, setIsRunning] = useState(false);
     const [detections, setDetections] = useState<Detection[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -13,25 +17,7 @@ export function useDetector(modelPath: string) {
     const animationFrameRef = useRef<number>(0);
     const videoRef = useRef<HTMLVideoElement | null>(null);
 
-    useEffect(() => {
-        const init = async () => {
-            try {
-                const detector = new YoloxDetector();
-                await detector.load(modelPath);
-                detectorRef.current = detector;
-                setLoading(false);
-            } catch (e) {
-                console.error("Initialization failed", e);
-                setError("Failed to load AI Model. Please refresh.");
-            }
-        };
-        init();
-
-        return () => {
-            // Cleanup if needed
-        };
-    }, [modelPath]);
-
+    // loop function remains the same
     const loop = useCallback(async () => {
         if (!videoRef.current || !detectorRef.current || !isRunning) return;
 
@@ -50,11 +36,27 @@ export function useDetector(modelPath: string) {
         }
     }, [isRunning]);
 
-    const start = useCallback(() => {
+    const start = useCallback(async () => {
         if (!videoRef.current) return;
-
         setError(null);
 
+        // 1. Lazy Load Model if not loaded
+        if (!detectorRef.current) {
+            setLoading(true);
+            try {
+                const detector = new YoloxDetector();
+                await detector.load(modelPath);
+                detectorRef.current = detector;
+            } catch (e) {
+                console.error("Initialization failed", e);
+                setError("Failed to load AI Model. Please refresh.");
+                setLoading(false);
+                return;
+            }
+            setLoading(false);
+        }
+
+        // 2. Start Camera
         navigator.mediaDevices.getUserMedia({
             video: { width: { ideal: 640 }, height: { ideal: 480 } }
         }).then(stream => {
@@ -75,7 +77,7 @@ export function useDetector(modelPath: string) {
                 setError(`⚠️ Camera Error: ${err.name || err.message || 'Unknown'}`);
             }
         });
-    }, []);
+    }, [modelPath]);
 
     const stop = useCallback(() => {
         setIsRunning(false);

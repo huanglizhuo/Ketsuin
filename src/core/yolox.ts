@@ -26,9 +26,9 @@ export class YoloxDetector {
 
     async load(modelPath: string) {
         try {
-            // Configure WASM paths to serve from /onnx/ directory
-            // Use window.location.origin to make it an absolute URL, bypassing Vite's "public file import" check
-            ort.env.wasm.wasmPaths = window.location.origin + '/onnx/';
+            // Configure WASM paths to serve from jsDelivr CDN
+            // This saves ~25MB of bandwidth per user compared to serving from Vercel
+            ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.23.2/dist/';
 
             // Set to use wasm
             this.session = await ort.InferenceSession.create(modelPath, {

@@ -2,7 +2,8 @@
 
 @font-face {
   font-family: 'AaJianMingShouShu-2';
-  src: url('/fonts/AaJianMingShouShu-2.ttf') format('truetype');
+  /* Load from GitHub Pages CDN to save Vercel bandwidth */
+  src: url('https://huanglizhuo.github.io/Ketsuin/fonts/AaJianMingShouShu-2.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
