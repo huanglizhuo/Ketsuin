@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useDetector } from './hooks/useDetector';
+import { useJutsuGame } from './hooks/useJutsuGame';
+import { useFaceMesh } from './hooks/useFaceMesh';
 import { VideoFeed } from './components/VideoFeed';
+import { Header } from './components/Header';
+import { SignList } from './components/SignList';
+import { BasicModeEditor } from './components/BasicModeEditor';
+import { JutsuHUD } from './components/JutsuHUD';
+import { VFXCanvas } from './components/VFXCanvas';
 import { SignManager } from './core/SignManager';
 import { HAND_SIGNS } from './config/data';
 
@@ -8,185 +15,161 @@ const signManager = new SignManager();
 
 function App() {
   const { loading, isRunning, start, stop, detections, videoRef } = useDetector('model/yolox_nano.onnx');
+  const faceState = useFaceMesh(videoRef, isRunning);
+
+  // Basic Mode State
   const [history, setHistory] = useState<number[]>([]);
   const [editorText, setEditorText] = useState('');
-  const [activeJutsu, setActiveJutsu] = useState<{ name: string, nameEn: string } | null>(null);
 
+  // Jutsu Mode State
+  const { mode, setMode, inputBuffer, lastInputTime, activeJutsu, processSign, clearBuffer, debugTrigger } = useJutsuGame();
+
+  // Unified Processing Effect
   useEffect(() => {
-    // Process detections
     if (detections.length > 0) {
       const best = detections[0];
+      const signId = best.classId + 1; // 0->1 mapping
 
-      const events = signManager.process(best.classId);
-
-      if (events.length > 0) {
-        // Update history view
-        setHistory([...signManager.getDisplayQueue()]);
-
-        // Handle events
-        events.forEach(event => {
-          if (event.type === 'COMMAND') {
-            const { action, text, keys } = event.data;
-            if (action === 'write') {
-              setEditorText(prev => prev + text);
-            } else if (action === 'shortcut') {
-              if (keys) {
-                if (keys.includes('Enter')) {
-                  setEditorText(prev => prev + '\n');
-                }
-                if (keys.includes('o') && keys.includes('Control')) {
-                  setEditorText("print(\"\")");
+      if (mode === 'basic') {
+        // --- Legacy Basic Logic ---
+        const events = signManager.process(best.classId); // passing 0-indexed ID to legacy manager
+        if (events.length > 0) {
+          setHistory([...signManager.getDisplayQueue()]);
+          events.forEach(event => {
+            if (event.type === 'COMMAND') {
+              const { action, text, keys } = event.data;
+              if (action === 'write') setEditorText(prev => prev + text);
+              else if (action === 'shortcut') {
+                if (keys) {
+                  if (keys.includes('Enter')) setEditorText(prev => prev + '\n');
+                  if (keys.includes('o') && keys.includes('Control')) setEditorText("print(\"\")");
                 }
               }
+            } else if (event.type === 'KEY') {
+              const { key } = event.data;
+              if (key === 'space') setEditorText(prev => prev + ' ');
             }
-          } else if (event.type === 'KEY') {
-            const { key } = event.data;
-            if (key === 'space') setEditorText(prev => prev + ' ');
-          } else if (event.type === 'JUTSU') {
-            const jutsu = event.data;
-            setActiveJutsu({ name: jutsu.name, nameEn: jutsu.nameEn });
-            setTimeout(() => setActiveJutsu(null), 5000);
-          }
-        });
+          });
+        }
+      } else {
+        // --- Jutsu Game Logic ---
+        processSign(signId);
       }
     } else {
-      if (signManager.checkTimeout()) {
+      // Timeout checks for basic mode
+      if (mode === 'basic' && signManager.checkTimeout()) {
         setHistory([]);
       }
     }
-  }, [detections]);
-
-  // UI Styles
-  const containerStyle = {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    height: '100vh',
-    backgroundColor: '#1a1a1a',
-    color: '#eee',
-    fontFamily: 'sans-serif'
-  };
-
-  const mainStyle = {
-    display: 'flex',
-    flex: 1,
-    padding: '20px',
-    gap: '20px',
-    overflow: 'hidden'
-  };
-
-  const sideColStyle = {
-    width: '180px',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '10px',
-    overflowY: 'auto' as const
-  };
-
-  const centerColStyle = {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '15px',
-    minWidth: '640px'
-  };
-
-  const signItemStyle = (active: boolean) => ({
-    padding: '5px',
-    backgroundColor: active ? '#444' : '#222',
-    border: active ? '2px solid #0f0' : '1px solid #444',
-    borderRadius: '8px',
-    textAlign: 'center' as const,
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center'
-  });
+  }, [detections, mode, processSign]);
 
   return (
-    <div style={containerStyle}>
-      <header style={{ padding: '10px 20px', backgroundColor: '#333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ margin: 0 }}>NARUTO CODING WEB</h1>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button
-            onClick={isRunning ? stop : start}
-            disabled={loading}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: isRunning ? '#d32f2f' : '#388e3c',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: loading ? 'wait' : 'pointer'
-            }}
-          >
-            {loading ? 'Loading Model...' : isRunning ? 'Stop Jutsu' : '开始结印'}
-          </button>
-        </div>
-      </header>
+    <div className="min-h-screen bg-ninja-black text-gray-200 font-sans flex flex-col overflow-hidden">
+      {/* Header */}
+      <Header
+        mode={mode}
+        setMode={setMode}
+        loading={loading}
+        isRunning={isRunning}
+        start={start}
+        stop={stop}
+      />
 
-      <main style={mainStyle}>
-        {/* Left Signs */}
-        <div style={sideColStyle}>
-          {HAND_SIGNS.slice(1, 7).map(sign => (
-            <div key={sign.id} style={signItemStyle(false)}>
-              <img src={`asset/${sign.kanji}.png`} alt={sign.name} style={{ width: '100%', height: 'auto', objectFit: 'contain' }} onError={(e) => e.currentTarget.style.display = 'none'} />
-              <span>{sign.name} ({sign.kanji})</span>
+      {/* Main Layout */}
+      <main className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        {/* Background Pattern overlay */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(circle_at_center,_#333_1px,_transparent_1px)] bg-[length:20px_20px]"></div>
+
+        {/* Left Signs (Desktop) */}
+        <SignList
+          className="w-48 border-r"
+          signs={HAND_SIGNS.slice(1, 7)} // A: 1-6
+          title="Hand Signs A"
+        />
+
+        {/* Center Content */}
+        <div className="flex-1 flex flex-col gap-4 p-4 min-w-0 overflow-y-auto relative">
+
+          {/* Jutsu HUD Overlay (Only in Jutsu Mode) */}
+          {mode !== 'basic' && (
+            <>
+              <JutsuHUD inputBuffer={inputBuffer} lastInputTime={lastInputTime} highlightJutsu={activeJutsu} />
+
+              {/* Practice Mode: Manual Clear Button & Debug */}
+              {mode === 'jutsu_practice' && (
+                <div className="absolute bottom-20 right-4 z-40 pointer-events-auto flex flex-col gap-2 items-end">
+                  {inputBuffer.length > 0 && (
+                    <button
+                      onClick={clearBuffer}
+                      className="bg-red-900/80 hover:bg-red-700 text-white px-4 py-2 rounded border border-red-500 shadow-lg text-xs font-bold uppercase tracking-widest backdrop-blur-sm flex items-center gap-2 transition-all hover:scale-105"
+                    >
+                      <span>🗑️</span> Clear Seals
+                    </button>
+                  )}
+                  <button
+                    onClick={debugTrigger}
+                    className="bg-blue-900/80 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-500 shadow-lg text-xs font-bold uppercase tracking-widest backdrop-blur-sm flex items-center gap-2 transition-all hover:scale-105"
+                  >
+                    <span>⚡</span> Debug: Instant Cast
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Video Feed */}
+          <div className="relative w-full max-w-2xl mx-auto z-0">
+            <div className={`relative aspect-video bg-black rounded-lg overflow-hidden border-2 shadow-2xl group transition-colors duration-500 ${activeJutsu ? 'border-red-500 shadow-[0_0_30px_#f00]' : 'border-gray-700 hover:border-konoha-orange'}`}>
+
+              {/* VFX Layer (Simple Active Jutsu Overlay for now) */}
+              {activeJutsu && (
+                <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none animate-ping-slow">
+                  <h2 className="text-6xl font-bold text-white drop-shadow-[0_0_10px_rgba(255,0,0,0.8)] stroke-black tracking-widest font-ninja">
+                    {activeJutsu.name}
+                  </h2>
+                </div>
+              )}
+
+              <VideoFeed videoRef={videoRef} detections={detections} />
+
+              {/* VFX Overlay */}
+              <VFXCanvas
+                activeJutsu={activeJutsu}
+                faceState={faceState}
+                detections={detections}
+                width={640}
+                height={480}
+              />
+
+              {/* Scanline effect */}
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent h-full w-full pointer-events-none animate-scan"></div>
             </div>
-          ))}
-        </div>
 
-        {/* Center */}
-        <div style={centerColStyle}>
-          {/* Video Area */}
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <VideoFeed videoRef={videoRef} detections={detections} />
+            {/* Status Indicator */}
+            <div className="absolute top-4 left-4 px-2 py-1 bg-black/80 border border-green-500 text-green-500 text-xs font-mono rounded backdrop-blur-sm shadow flex flex-col gap-1">
+              <span>SYS: {isRunning ? 'ACTIVE' : 'STANDBY'}</span>
+              <span>FACE: {faceState.faceDetected ? 'LOCKED' : 'SEARCHING'}</span>
+            </div>
           </div>
 
-          {/* History and Jutsu */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#222', padding: '10px', borderRadius: '4px' }}>
-            <div>
-              <strong>History: </strong>
-              {history.map(id => HAND_SIGNS.find(s => s.id === id)?.kanji).join(' -> ')}
-            </div>
-            {activeJutsu && (
-              <div style={{ color: '#ff5722', fontWeight: 'bold', fontSize: '1.2em' }}>
-                {activeJutsu.name} ({activeJutsu.nameEn})
-              </div>
-            )}
-          </div>
-
-          {/* Editor */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ backgroundColor: '#333', padding: '5px 10px', fontSize: '0.8em' }}>Virtual Code Editor</div>
-            <textarea
-              value={editorText}
-              onChange={(e) => setEditorText(e.target.value)}
-              style={{
-                flex: 1,
-                backgroundColor: '#1e1e1e',
-                color: '#dcdcdc',
-                fontFamily: 'monospace',
-                padding: '10px',
-                border: 'none',
-                resize: 'none'
-              }}
-              spellCheck={false}
+          {/* Basic Mode UI: History & Editor */}
+          {mode === 'basic' && (
+            <BasicModeEditor
+              history={history}
+              editorText={editorText}
+              setEditorText={setEditorText}
             />
-          </div>
-
-          <div style={{ backgroundColor: '#222', padding: '10px', fontSize: '0.9em' }}>
-            <strong>Tutorial:</strong> Rat(子)=l, Ox(丑)=h, Tiger(寅)=e, Dragon(辰)=r, Snake(巳)=d, Horse(午)=w, Ram(未)=o, Monkey(申)=x
-          </div>
+          )}
         </div>
 
-        {/* Right Signs */}
-        <div style={sideColStyle}>
-          {HAND_SIGNS.slice(7, 13).map(sign => (
-            <div key={sign.id} style={signItemStyle(false)}>
-              <img src={`asset/${sign.kanji}.png`} alt={sign.name} style={{ width: '100%', height: 'auto', objectFit: 'contain' }} onError={(e) => e.currentTarget.style.display = 'none'} />
-              <span>{sign.name} ({sign.kanji})</span>
-            </div>
-          ))}
-        </div>
+        {/* Right Signs (Desktop) */}
+        <SignList
+          className="w-48 border-l"
+          signs={HAND_SIGNS.slice(7, 13)} // B: 7-12
+          title="Hand Signs B"
+        />
+
+
       </main>
     </div>
   );

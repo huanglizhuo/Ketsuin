@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { YoloxDetector } from '../core/yolox';
 import type { Detection } from '../core/yolox';
 
+export type { Detection };
+
 export function useDetector(modelPath: string) {
     const [loading, setLoading] = useState(true);
     const [isRunning, setIsRunning] = useState(false);

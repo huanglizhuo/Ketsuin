@@ -23,92 +23,59 @@ export const HAND_SIGNS: HandSign[] = [
   { id: 15, name: 'Mizunoe', kanji: '壬' },
 ];
 
+export type JutsuTriggerType = 'auto' | 'mouth_blow' | 'hand_hold';
+
 export interface Jutsu {
+  id: string;
   name: string;
   nameEn: string;
   sequence: number[]; // Array of HandSign IDs
+  trigger: JutsuTriggerType;
+  description?: string;
 }
 
-// Derived from jutsu.csv
-// Format: Type, TypeEn, Name, NameEn, Sign1, Sign2, ...
-// We map Kanji to IDs.
-export const JUTSU_LIST: Jutsu[] = [
+// The main requested Jutsus
+export const SUPPORTED_JUTSUS: Jutsu[] = [
   {
-    name: '豪火球术',
-    nameEn: 'Fireball Jutsu',
-    sequence: [6, 3, 9, 12, 7, 3], // 巳,寅,申,亥,午,寅
+    id: 'fireball',
+    name: '火遁·豪火球之术',
+    nameEn: 'Fire Style: Fireball Jutsu',
+    sequence: [6, 8, 9, 12, 7, 3], // 巳－未－申－亥－午－寅
+    trigger: 'mouth_blow',
+    description: 'Blow fire from your mouth after completing the signs.'
   },
   {
+    id: 'chidori',
+    name: '雷切',
+    nameEn: 'Chidori / Raikiri',
+    sequence: [3, 6, 9, 3], // 寅 → 巳 → 申 → 寅 (Simplified Chidori sequence)
+    trigger: 'hand_hold', // Tracks right hand
+    description: 'Focus chakra in your hand to create lightning.'
+  },
+  {
+    id: 'summoning',
+    name: '通灵之术',
+    nameEn: 'Summoning Jutsu',
+    sequence: [12, 11, 10, 9, 8], // 亥 → 戌 → 酉 → 申 → 未
+    trigger: 'auto',
+    description: 'Summon a spirit animal.'
+  }
+];
+
+// Legacy list for reference or basic recognition mode
+export const LEGACY_JUTSU_LIST: Omit<Jutsu, 'id' | 'trigger'>[] = [
+  {
     name: '豪火球术',
     nameEn: 'Fireball Jutsu',
-    sequence: [6, 8, 9, 12, 7, 3], // 巳,未,申,亥,午,寅
+    sequence: [6, 3, 9, 12, 7, 3],
   },
   {
     name: '分身术',
     nameEn: 'Clone Jutsu',
-    sequence: [8, 6, 3], // 未,巳,寅
+    sequence: [8, 6, 3],
   },
-  {
-    name: '通灵术',
-    nameEn: 'Summoning Jutsu',
-    sequence: [11, 12, 10, 9, 8], // 戌,亥,酉,申,未
-  },
-  {
-    name: '通灵 土遁追牙术',
-    nameEn: 'Summoning: Earth Style: Fanged Pursuit Jutsu',
-    sequence: [3, 6, 5, 11], // 寅,巳,辰,戌
-  },
-  {
-    name: '凤仙花术',
-    nameEn: 'Phoenix Flower Jutsu',
-    sequence: [1, 3, 11, 2, 4, 3], // 子,寅,戌,丑,卯,寅
-  },
-  {
-    name: '水乱破术',
-    nameEn: 'Water Trumpet',
-    sequence: [5, 3, 4], // 辰,寅,卯
-  },
-  {
-    name: '通灵 秽土转生术',
-    nameEn: 'Summoning Jutsu: Impure World Reincarnation',
-    sequence: [3, 6, 11, 5, 13], // 寅,巳,戌,辰,祈
-  },
-  {
-    name: '龙火术',
-    nameEn: 'Dragon Flame Jutsu',
-    sequence: [6, 5, 4, 3], // 巳,辰,卯,寅
-  },
-  {
-    name: '水鲛弹术',
-    nameEn: 'Water Shark Bomb Jutsu',
-    sequence: [3, 2, 5, 4, 10, 5, 8], // 寅,丑,辰,卯,酉,辰,未
-  },
-  {
-    name: '尸鬼封尽术',
-    nameEn: 'Sealing Jutsu: Reaper Death Seal',
-    sequence: [6, 12, 8, 4, 11, 1, 10, 7, 6, 13], // 巳,亥,未,卯,戌,子,酉,午,巳,祈
-  },
-  {
-    name: '水龙弹术',
-    nameEn: 'Water Dragon Jutsu',
-    sequence: [
-      2, 9, 4, 1, 12, 10, 2, 7, 10, 1, 3, 11, 3, 6, 2, 8, 6, 12, 8, 1, 15, 9, 10, 5, 10, 2, 7, 8, 3, 6, 1, 9, 4, 12, 5, 8, 1, 2, 9, 10, 15, 1, 12, 10
-    ], // Long sequence
-  },
-  {
-    name: '火龙炎弹术',
-    nameEn: 'Dragon Flame Bomb',
-    sequence: [8, 7, 6, 5, 1, 2, 3], // 未,午,巳,辰,子,丑,寅
-  },
-  {
-    name: '替身术',
-    nameEn: 'Substitution Jutsu',
-    sequence: [8, 12, 2, 11, 6], // 未,亥,丑,戌,巳
-  },
+  // ... more can be added back if needed
 ];
-
-// Mappings from sign sequences (tuple as string or array) to actions
-// Using array of IDs as key is tricky in Map, so we'll use string join ','
 
 export const WORD_MAPPINGS: Record<string, string> = {
   '1': 'l', // 子 -> l
@@ -126,9 +93,7 @@ export const SPECIAL_KEY_MAPPINGS: Record<string, string> = {
 };
 
 export const SHORTCUT_MAPPINGS: Record<string, string[]> = {
-  '13': ['Control', 'Enter'], // 祈 -> Ctrl+Enter (Assuming 13 is Prayer which triggers run in App?? CHECK: Original Py mapped 13 to Ctrl+Enter?)
-  // Python: (13,): ['ctrl', 'enter']
-  // Python: (10,): ['ctrl', 'o']
+  '13': ['Control', 'Enter'],
   '10': ['Control', 'o'],
 };
 
@@ -142,4 +107,5 @@ export const CONFIG = {
   CHATTERING_CHECK: 1, // frame count
   MAX_HISTORY: 44,
   MAX_DISPLAY: 18,
+  JUTSU_WINDOW_MS: 5000, // New: 5s window for jutsu mode
 };

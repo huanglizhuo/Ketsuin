@@ -35,15 +35,17 @@ export const VideoFeed: React.FC<VideoFeedProps> = ({ videoRef, detections }) =>
             const w = x2 - x1;
             const h = y2 - y1;
 
-            ctx.strokeStyle = '#00ff00';
+            ctx.strokeStyle = '#F2A900';
+            ctx.shadowColor = '#F2A900';
+            ctx.shadowBlur = 10;
             ctx.lineWidth = 2;
             ctx.strokeRect(x1, y1, w, h);
 
             const sign = HAND_SIGNS.find(s => s.id === det.classId + 1); // Mapping 0 -> 1 based on previous logic
-            const label = sign ? `${sign.name} (${det.score.toFixed(2)})` : `Unknown ${det.classId}`;
+            const label = sign ? `${sign.kanji} ${sign.name} (${det.score.toFixed(2)})` : `Unknown ${det.classId}`;
 
-            ctx.fillStyle = '#00ff00'; // text bg
-            ctx.font = '16px Arial';
+            ctx.fillStyle = '#F2A900'; // text bg
+            ctx.font = '16px "AaJianMingShouShu-2"';
             ctx.fillText(label, x1, y1 - 5);
         });
 
