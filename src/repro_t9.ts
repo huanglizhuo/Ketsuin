@@ -3,8 +3,8 @@ import { T9Engine } from './core/T9Engine';
 
 const engine = new T9Engine();
 
-const sequence = [4, 3, 5, 5, 6]; // h, e, l, l, o
-// 4 (g,h,i) -> h
+// sequence removed
+console.log("Testing input 'hello' (43556)...");
 // 3 (d,e,f) -> e
 // 5 (j,k,l) -> l
 // 5 (j,k,l) -> l
