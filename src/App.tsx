@@ -114,7 +114,7 @@ function App() {
       {/* Background Image: Shinra Tensei */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <img
-          src="/asset/shinra.png"
+          src={`${import.meta.env.BASE_URL}asset/shinra.png`}
           alt="Background"
           className="w-full h-full object-cover blur-none scale-105 opacity-90"
         />

@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
             )}
 
             <div className="flex items-center gap-3 relative z-50">
-                <img src="/asset/ketsuin.png" alt="Ketsuin Logo" className="w-10 h-10 object-contain drop-shadow-md" />
+                <img src={`${import.meta.env.BASE_URL}asset/ketsuin.png`} alt="Ketsuin Logo" className="w-10 h-10 object-contain drop-shadow-md" />
                 <h1 className="text-2xl md:text-3xl text-konoha-orange font-bold tracking-wider text-gray-100 font-ninja drop-shadow-md">
                     结印 keyboard
                 </h1>

@@ -52,7 +52,7 @@ export const T9Keyboard: React.FC<T9KeyboardProps & { className?: string }> = ({
                             "opacity-40 group-hover:opacity-40": !isActive
                         })}>
                             <img
-                                src={`asset/${signKanji}.png`}
+                                src={`${import.meta.env.BASE_URL}asset/${signKanji}.png`}
                                 alt=""
                                 className="w-full h-full object-cover"
                                 onError={(e) => e.currentTarget.style.display = 'none'}
