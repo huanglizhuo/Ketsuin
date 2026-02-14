@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ketsuin.vercel.app/sitemap.xml
