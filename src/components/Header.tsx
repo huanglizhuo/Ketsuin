@@ -9,10 +9,10 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ loading, isRunning, start, stop }) => {
     return (
-        <header className="px-6 py-4 bg-gray-900 border-b-2 border-akatsuki-red flex justify-between items-center shadow-lg z-10 relative">
+        <header className="px-6 py-4 bg-transparent flex justify-between items-center z-10 relative">
             <div className="flex items-center gap-3">
                 <h1 className="text-2xl md:text-3xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-konoha-orange to-red-600 font-ninja">
-                    结印　Ketsuin
+                    结印 T9 keyboard
                 </h1>
             </div>
 

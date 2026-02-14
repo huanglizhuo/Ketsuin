@@ -23,18 +23,18 @@ export const T9EditorDisplay: React.FC<T9InputState> = ({
     fullSignSequence = []
 }) => {
     return (
-        <div className="bg-[#1e1e1e] border border-gray-700 rounded-lg overflow-hidden shadow-lg flex flex-col h-full min-h-[200px]">
+        <div className="bg-black/30 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden shadow-lg flex flex-col h-full min-h-[200px]">
             {/* Committed Text (Editable) */}
             <textarea
-                className="flex-[2] p-4 font-mono text-gray-300 text-lg bg-transparent resize-none focus:outline-none focus:ring-1 focus:ring-konoha-orange/50 border-b border-gray-800"
+                className="flex-[2] p-4 font-mono text-gray-200 text-lg bg-transparent resize-none focus:outline-none focus:ring-1 focus:ring-konoha-orange/50 border-b border-white/10 placeholder-gray-500"
                 value={committedText}
                 onChange={(e) => onTextChange?.(e.target.value)}
                 placeholder="Type here or use hand signs..."
             />
 
             {/* Gesture Input List (Reverse Mapped) */}
-            <div className="flex-1 bg-black/30 p-2 overflow-x-auto flex items-center gap-2 border-b border-[#333] min-h-[60px]">
-                <span className="text-xs text-gray-600 font-mono shrink-0 uppercase tracking-widest mr-2">Seals:</span>
+            <div className="flex-1 bg-black/20 p-2 overflow-x-auto flex items-center gap-2 border-b border-white/10 min-h-[60px]">
+                <span className="text-xs text-gray-500 font-mono shrink-0 uppercase tracking-widest mr-2">Seals:</span>
                 {fullSignSequence.map((signId, i) => {
                     const sign = HAND_SIGNS.find(s => s.id === signId);
                     return (
@@ -51,7 +51,7 @@ export const T9EditorDisplay: React.FC<T9InputState> = ({
             </div>
 
             {/* Candidate Bar (Bottom of Editor) */}
-            <div className="bg-[#2d2d2d] border-t border-[#333] p-2 flex items-center gap-3 overflow-x-auto shrink-0">
+            <div className="bg-black/40 border-t border-white/10 p-2 flex items-center gap-3 overflow-x-auto shrink-0">
                 <span className="text-xs text-gray-500 font-mono">INPUT:</span>
                 <span className="text-konoha-orange font-bold font-mono tracking-widest min-w-[20px]">{currentSequence}</span>
 

@@ -39,29 +39,33 @@ export const T9Keyboard: React.FC<T9KeyboardProps & { className?: string }> = ({
                     <div
                         key={key.id}
                         className={classNames(
-                            'relative w-full h-full rounded-md flex flex-col justify-center items-center transition-all duration-200 border min-h-0',
+                            'relative w-full h-full rounded-md flex flex-col justify-start items-start p-1 md:p-2 transition-all duration-200 border min-h-0 overflow-hidden group',
                             {
                                 'bg-konoha-orange border-konoha-orange text-black scale-105 z-10 shadow-[0_0_15px_#F2A900]': isActive,
                                 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-750': !isActive
                             }
                         )}
                     >
+                        {/* Background Hand Sign Image */}
+                        <div className={classNames("absolute inset-0 z-0 flex items-center justify-center pointer-events-none transition-opacity duration-300", {
+                            "opacity-40": isActive,
+                            "opacity-40 group-hover:opacity-40": !isActive
+                        })}>
+                            <img
+                                src={`asset/${signKanji}.png`}
+                                alt=""
+                                className="w-full h-full object-cover"
+                                onError={(e) => e.currentTarget.style.display = 'none'}
+                            />
+                        </div>
+
                         {/* Top Left: Number/Sign ID */}
-                        <span className="absolute top-1 left-2 text-[10px] md:text-sm font-mono opacity-50">
+                        <span className="text-[10px] md:text-lg text-konoha-orange font-mono opacity-100 z-10 mb-0.5">
                             {key.signId === 10 ? '*' : key.signId === 11 ? '0' : key.signId === 12 ? '#' : key.id}
                         </span>
-
-                        {/* Top Right: Kanji */}
+                        {/* Letters/Func (Below Number) */}
                         <span className={classNames(
-                            "absolute top-1 right-2 text-sm md:text-3xl font-bold",
-                            { "text-black": isActive, "text-konoha-orange": !isActive }
-                        )}>
-                            {signKanji}
-                        </span>
-
-                        {/* Center: Letters/Func */}
-                        <span className={classNames(
-                            "font-bold tracking-widest text-center",
+                            "font-bold text-konoha-orange tracking-widest text-left w-full break-words z-10 leading-none",
                             {
                                 "text-lg md:text-2xl": !key.isFunc,
                                 "text-sm md:text-lg": key.isFunc

@@ -1,73 +1,70 @@
-# React + TypeScript + Vite
+# 结印 Ketsuin - Ninja Hand Sign Input
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[中文文档](README_zh.md)
 
-Currently, two official plugins are available:
+**Ketsuin** is an experimental input method that replaces the traditional keyboard with **Ninja Hand Signs** (based on Naruto seals). It utilizes computer vision to detect hand gestures in real-time and maps them to a T9 predictive text system.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![Ketsuin Screenshot](public/asset/shinra.png)
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+-   **Hand Sign Detection**: Uses a lightweight YOLOX-Nano model via ONNX Runtime to detect 12 distinct hand signs.
+-   **T9 Ninja Engine**: Implements a strict T9 input system where each hand sign corresponds to a key on a traditional phone keypad.
+-   **Predictive Text**: Suggests words based on the input sequence using a built-in dictionary.
+-   **Reverse Mapping**: Type manually to see the corresponding hand seal sequence dynamically displayed.
+-   **Mobile Optimized**: Fully responsive layout that works on desktop and mobile devices.
+-   **Continuous Delete**: Hold the "Bird" sign to rapidly delete text.
 
-## Expanding the ESLint configuration
+## How to Use
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### The 12 Signs of the Zodiac
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+The input method uses the 12 hand signs (Rat, Ox, Tiger, etc.) mapped to the keys 1-9, *, 0, #.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+| Sign ID | Hand Sign | T9 Key | Function / Letters |
+| :--- | :--- | :--- | :--- |
+| **1** | **Rat (子)** | **1** | `. , ? ! : ; 1` |
+| **2** | **Ox (丑)** | **2** | `A B C 2` |
+| **3** | **Tiger (寅)** | **3** | `D E F 3` |
+| **4** | **Hare (卯)** | **4** | `G H I 4` |
+| **5** | **Dragon (辰)** | **5** | `J K L 5` |
+| **6** | **Snake (巳)** | **6** | `M N O 6` |
+| **7** | **Horse (午)** | **7** | `P Q R S 7` |
+| **8** | **Ram (未)** | **8** | `T U V 8` |
+| **9** | **Monkey (申)** | **9** | `W X Y Z 9` |
+| **10** | **Bird (酉)** | **(*)** | **DELETE / BACKSPACE** (Hold to continuous delete) |
+| **11** | **Dog (戌)** | **(0)** | **SPACE / CONFIRM CANDIDATE** |
+| **12** | **Boar (亥)** | **(#)** | **NEXT CANDIDATE / CYCLE** |
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Basic Operation
+
+1.  **Form a Sign**: Show a hand sign to the camera.
+2.  **Input**: The corresponding number is added to your sequence.
+3.  **Candidates**: Words matching the sequence will appear.
+4.  **Cycle**: Use the **Boar (#)** sign to cycle through candidate words.
+5.  **Confirm**: Use the **Dog (0)** sign to confirm the selected word and insert a space.
+6.  **Delete**: Use the **Bird (*)** sign to delete the last character.
+
+## Development
+
+### Prerequisites
+
+-   Node.js
+-   npm
+
+### Setup
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Tech Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+-   **React + TypeScript + Vite**: Frontend framework.
+-   **ONNX Runtime Web**: For running the YOLOX object detection model in the browser.
+-   **Tailwind CSS**: For styling and responsive design.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## License
+
+MIT

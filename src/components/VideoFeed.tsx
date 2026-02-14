@@ -53,10 +53,10 @@ export const VideoFeed: React.FC<VideoFeedProps> = ({ videoRef, detections }) =>
 
     const containerStyle: React.CSSProperties = {
         position: 'relative',
-        width: '640px',
-        height: '480px',
+        width: '100%',
+        height: '100%',
         backgroundColor: 'black',
-        border: '2px solid #333',
+        // border: '2px solid #333', // Border handled by parent
     };
 
     const absStyle: React.CSSProperties = {

@@ -1,20 +1,16 @@
 import { useEffect, useState, useRef } from 'react';
 import { useDetector } from './hooks/useDetector';
-import { useFaceMesh } from './hooks/useFaceMesh';
 import { VideoFeed } from './components/VideoFeed';
 import { Header } from './components/Header';
-import { SignList } from './components/SignList';
-import { T9EditorDisplay } from './components/BasicModeEditor';
+import { T9EditorDisplay } from './components/T9EditorDisplay';
 import { T9Keyboard } from './components/T9Keyboard';
 import { SignManager } from './core/SignManager';
 import { T9Engine } from './core/T9Engine';
-import { HAND_SIGNS } from './config/data';
 
 const signManager = new SignManager();
 
 function App() {
   const { loading, isRunning, start, stop, detections, videoRef } = useDetector('model/yolox_nano.onnx');
-  const faceState = useFaceMesh(videoRef, isRunning);
 
   // T9 Engine State
   const t9EngineRef = useRef(new T9Engine());
@@ -73,7 +69,17 @@ function App() {
   }, [detections]);
 
   return (
-    <div className="min-h-screen bg-ninja-black text-gray-200 font-sans flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-ninja-black text-gray-200 font-sans flex flex-col overflow-hidden relative">
+      {/* Background Image: Shinra Tensei */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <img
+          src="/asset/shinra.png"
+          alt="Background"
+          className="w-full h-full object-cover blur-none scale-105 opacity-90"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80"></div>
+      </div>
+
       {/* Header */}
       <Header
         loading={loading}
@@ -83,22 +89,13 @@ function App() {
       />
 
       {/* Main Layout */}
-      <main className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-        {/* Background Pattern overlay */}
-        <div className="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(circle_at_center,_#333_1px,_transparent_1px)] bg-[length:20px_20px]"></div>
-
-        {/* Left Signs (Desktop) */}
-        <SignList
-          className="w-48 border-r"
-          signs={HAND_SIGNS.slice(1, 7)} // A: 1-6
-          title="Hand Signs A"
-        />
+      <main className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden relative z-10">
 
         {/* Center Content */}
-        <div className="flex-1 flex flex-col gap-4 p-4 min-w-0 overflow-y-auto relative">
+        <div className="flex-1 flex flex-col gap-4 p-4 min-w-0 overflow-visible md:overflow-y-auto relative order-1 md:order-2">
 
           {/* Video Feed */}
-          <div className="relative w-full max-w-2xl mx-auto z-0">
+          <div className="relative w-full max-w-2xl mx-auto z-0 shrink-0">
             <div className={`relative aspect-video bg-black rounded-lg overflow-hidden border-2 shadow-2xl group transition-colors duration-500 border-gray-700 hover:border-konoha-orange`}>
 
               <VideoFeed videoRef={videoRef} detections={detections} />
@@ -110,25 +107,24 @@ function App() {
             {/* Status Indicator */}
             <div className="absolute top-4 left-4 px-2 py-1 bg-black/80 border border-green-500 text-green-500 text-xs font-mono rounded backdrop-blur-sm shadow flex flex-col gap-1">
               <span>SYS: {isRunning ? 'ACTIVE' : 'STANDBY'}</span>
-              <span>FACE: {faceState.faceDetected ? 'LOCKED' : 'SEARCHING'}</span>
             </div>
           </div>
 
           {/* Basic Mode UI: T9 Ninja Input Split Layout */}
-          <div className="flex-1 flex flex-row gap-4 min-h-0">
+          <div className="flex-1 flex flex-col md:flex-row gap-4 min-h-0 shrink-0">
             {/* Left Col: T9 Keyboard Reference */}
-            <div className="flex-1 flex flex-col gap-2 min-w-0 justify-center">
-              <div className="bg-gray-900 border border-gray-700 rounded-lg p-2 shadow-lg flex-1 flex flex-col justify-center">
-                <h3 className="text-x text-gray-500 font-mono text-center mb-2 uppercase tracking-widest">Ninja Keypad</h3>
+            <div className="flex-1 flex flex-col gap-2 min-w-0 justify-center order-2 md:order-1">
+              <div className="rounded-lg p-2 flex-1 flex flex-col justify-center backdrop-blur-sm bg-black/30 border border-white/10">
+                <h3 className="text-x text-gray-400 font-mono text-center mb-2 uppercase tracking-widest text-shadow">Ninja Keypad</h3>
                 <T9Keyboard activeSignId={detections.length > 0 ? detections[0].classId + 1 : null} />
-                <div className="text-center text-gray-600 text-[20px] font-mono mt-2">
+                <div className="text-center text-gray-400 text-[20px] font-mono mt-2 text-shadow">
                   戌(0)=Space | 亥(1)=Next | 酉(*)=Del
                 </div>
               </div>
             </div>
 
             {/* Right Col: Editor Result */}
-            <div className="flex-[1.5] min-w-0">
+            <div className="flex-[1.5] min-w-0 order-1 md:order-2">
               <T9EditorDisplay
                 {...t9State}
                 onTextChange={(text) => {
@@ -140,16 +136,10 @@ function App() {
           </div>
         </div>
 
-        {/* Right Signs (Desktop) */}
-        <SignList
-          className="w-48 border-l"
-          signs={HAND_SIGNS.slice(7, 13)} // B: 7-12
-          title="Hand Signs B"
-        />
-
       </main>
     </div>
   );
 }
+
 
 export default App;
