@@ -12,7 +12,7 @@ import { SignOverlay } from './components/SignOverlay';
 const signManager = new SignManager();
 
 function App() {
-  const { loading, isRunning, start, stop, detections, videoRef, error } = useDetector('model/yolox_nano.onnx');
+  const { loading, isRunning, start, stop, detections, videoRef, error } = useDetector();
 
   // T9 Engine State
   const t9EngineRef = useRef(new T9Engine());
