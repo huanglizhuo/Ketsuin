@@ -8,6 +8,8 @@
 
 **Ketsuin** is an experimental input method that replaces the traditional keyboard with **Ninja Hand Signs** (based on Naruto seals). It utilizes computer vision to detect hand gestures in real-time and maps them to a T9 predictive text system.
 
+![Ketsuin Demo](public/asset/demo.gif)
+
 ## Features
 
 -   **Hand Sign Detection**: Uses a lightweight YOLOX-Nano model via ONNX Runtime to detect 12 distinct hand signs.
