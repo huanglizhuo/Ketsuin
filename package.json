@@ -1,5 +1,5 @@
 {
-  "name": "KeTsuIn",
+  "name": "ketsuin",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,6 +14,7 @@
     "@mediapipe/camera_utils": "^0.3.1675466862",
     "@mediapipe/drawing_utils": "^0.3.1675466124",
     "@mediapipe/face_mesh": "^0.4.1633559619",
+    "@vercel/analytics": "^1.6.1",
     "classnames": "^2.5.1",
     "onnxruntime-web": "^1.23.2",
     "react": "^19.2.0",

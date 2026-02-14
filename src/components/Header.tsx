@@ -8,28 +8,58 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ loading, isRunning, start, stop }) => {
+    const [showTooltip, setShowTooltip] = React.useState(false);
+
+    React.useEffect(() => {
+        const hasStarted = localStorage.getItem('ketsuin_started');
+        if (!hasStarted) {
+            setShowTooltip(true);
+        }
+    }, []);
+
+    const handleStart = () => {
+        localStorage.setItem('ketsuin_started', 'true');
+        setShowTooltip(false);
+        start();
+    };
+
     return (
         <header className="px-6 py-4 bg-transparent flex justify-between items-center z-10 relative">
-            <div className="flex items-center gap-3">
+            {/* Fullscreen Backdrop for First Time Tooltip */}
+            {showTooltip && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-500 pointer-events-none" />
+            )}
+
+            <div className="flex items-center gap-3 relative z-50">
                 <img src="/asset/ketsuin.png" alt="Ketsuin Logo" className="w-10 h-10 object-contain drop-shadow-md" />
                 <h1 className="text-2xl md:text-3xl text-konoha-orange font-bold tracking-wider text-gray-100 font-ninja drop-shadow-md">
                     结印 keyboard
                 </h1>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 relative">
                 <button
-                    onClick={isRunning ? stop : start}
+                    onClick={isRunning ? stop : handleStart}
                     disabled={loading}
                     className={`
-                    px-6 py-2 bg-gray-800 border-2 rounded font-bold tracking-widest uppercase transition-all duration-300
+                    px-6 py-2 bg-gray-800 border-2 rounded font-bold tracking-widest uppercase transition-all duration-300 relative
+                    ${showTooltip ? 'z-50 shadow-[0_0_30px_rgba(242,169,0,0.6)] scale-110' : ''}
                     ${loading ? 'cursor-wait opacity-50 border-gray-600' : ''}
                     ${!loading && isRunning
                             ? 'border-akatsuki-red text-akatsuki-red hover:bg-akatsuki-red hover:text-white shadow-[0_0_15px_#980000]'
                             : 'border-konoha-orange text-konoha-orange hover:bg-konoha-orange hover:text-black shadow-[0_0_15px_#F2A900]'}
                 `}
                 >
-                    {loading ? 'Gathering Chakra...' : isRunning ? 'Release Jutsu' : 'Ketsuin Start'}
+                    {loading ? 'Gathering Chakra...' : isRunning ? 'Release Jutsu' : '結印 Start'}
+
+                    {/* Tooltip for first-time users */}
+                    {showTooltip && !loading && !isRunning && (
+                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 w-40 p-2 bg-konoha-orange text-black font-bold text-xs rounded text-center shadow-[0_0_10px_#F2A900] animate-bounce pointer-events-none z-50">
+                            <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 rotate-45 w-2 h-2 bg-konoha-orange"></div>
+                            Click to Start 结印!
+
+                        </div>
+                    )}
                 </button>
 
                 <a
