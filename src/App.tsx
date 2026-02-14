@@ -1,14 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDetector } from './hooks/useDetector';
-import { useJutsuGame } from './hooks/useJutsuGame';
 import { useFaceMesh } from './hooks/useFaceMesh';
 import { VideoFeed } from './components/VideoFeed';
 import { Header } from './components/Header';
 import { SignList } from './components/SignList';
-import { BasicModeEditor } from './components/BasicModeEditor';
-import { JutsuHUD } from './components/JutsuHUD';
-import { VFXCanvas } from './components/VFXCanvas';
+import { T9EditorDisplay } from './components/BasicModeEditor';
+import { T9Keyboard } from './components/T9Keyboard';
 import { SignManager } from './core/SignManager';
+import { T9Engine } from './core/T9Engine';
 import { HAND_SIGNS } from './config/data';
 
 const signManager = new SignManager();
@@ -17,12 +16,13 @@ function App() {
   const { loading, isRunning, start, stop, detections, videoRef } = useDetector('model/yolox_nano.onnx');
   const faceState = useFaceMesh(videoRef, isRunning);
 
-  // Basic Mode State
-  const [history, setHistory] = useState<number[]>([]);
-  const [editorText, setEditorText] = useState('');
+  // T9 Engine State
+  const t9EngineRef = useRef(new T9Engine());
+  const [t9State, setT9State] = useState(t9EngineRef.current.getState());
 
-  // Jutsu Mode State
-  const { mode, setMode, inputBuffer, lastInputTime, activeJutsu, processSign, clearBuffer, debugTrigger } = useJutsuGame();
+  // Delete Hold Tracking
+  const deleteHoldStartRef = useRef<number | null>(null);
+  const nextDeleteTimeRef = useRef<number>(0);
 
   // Unified Processing Effect
   useEffect(() => {
@@ -30,45 +30,52 @@ function App() {
       const best = detections[0];
       const signId = best.classId + 1; // 0->1 mapping
 
-      if (mode === 'basic') {
-        // --- Legacy Basic Logic ---
-        const events = signManager.process(best.classId); // passing 0-indexed ID to legacy manager
-        if (events.length > 0) {
-          setHistory([...signManager.getDisplayQueue()]);
-          events.forEach(event => {
-            if (event.type === 'COMMAND') {
-              const { action, text, keys } = event.data;
-              if (action === 'write') setEditorText(prev => prev + text);
-              else if (action === 'shortcut') {
-                if (keys) {
-                  if (keys.includes('Enter')) setEditorText(prev => prev + '\n');
-                  if (keys.includes('o') && keys.includes('Control')) setEditorText("print(\"\")");
-                }
-              }
-            } else if (event.type === 'KEY') {
-              const { key } = event.data;
-              if (key === 'space') setEditorText(prev => prev + ' ');
+      // --- Basic Mode (T9) Logic ---
+      const events = signManager.process(best.classId);
+      // Only trigger T9 Engine on NEW STABLE SIGNS
+      events.forEach(event => {
+        if (event.type === 'SIGN') {
+          const newSignId = event.data;
+          t9EngineRef.current.handleInput(newSignId);
+          setT9State(t9EngineRef.current.getState());
+        }
+      });
+
+      // --- Continuous Delete Logic ---
+      // Sign 10 (Bird) is Delete
+      if (signId === 10) {
+        const now = Date.now();
+        if (deleteHoldStartRef.current === null) {
+          deleteHoldStartRef.current = now;
+        } else {
+          const holdDuration = now - deleteHoldStartRef.current;
+          if (holdDuration > 2000) { // 2 seconds threshold
+            if (now >= nextDeleteTimeRef.current) {
+              t9EngineRef.current.handleInput(10); // Trigger Backspace
+              setT9State(t9EngineRef.current.getState());
+              nextDeleteTimeRef.current = now + 100; // 100ms interval
             }
-          });
+          }
         }
       } else {
-        // --- Jutsu Game Logic ---
-        processSign(signId);
+        // Reset if not holding delete
+        deleteHoldStartRef.current = null;
       }
+
     } else {
-      // Timeout checks for basic mode
-      if (mode === 'basic' && signManager.checkTimeout()) {
-        setHistory([]);
+      // No detections
+      deleteHoldStartRef.current = null;
+
+      if (signManager.checkTimeout()) {
+        // Optional: Clear T9 sequence on timeout? 
       }
     }
-  }, [detections, mode, processSign]);
+  }, [detections]);
 
   return (
     <div className="min-h-screen bg-ninja-black text-gray-200 font-sans flex flex-col overflow-hidden">
       {/* Header */}
       <Header
-        mode={mode}
-        setMode={setMode}
         loading={loading}
         isRunning={isRunning}
         start={start}
@@ -90,56 +97,11 @@ function App() {
         {/* Center Content */}
         <div className="flex-1 flex flex-col gap-4 p-4 min-w-0 overflow-y-auto relative">
 
-          {/* Jutsu HUD Overlay (Only in Jutsu Mode) */}
-          {mode !== 'basic' && (
-            <>
-              <JutsuHUD inputBuffer={inputBuffer} lastInputTime={lastInputTime} highlightJutsu={activeJutsu} />
-
-              {/* Practice Mode: Manual Clear Button & Debug */}
-              {mode === 'jutsu_practice' && (
-                <div className="absolute bottom-20 right-4 z-40 pointer-events-auto flex flex-col gap-2 items-end">
-                  {inputBuffer.length > 0 && (
-                    <button
-                      onClick={clearBuffer}
-                      className="bg-red-900/80 hover:bg-red-700 text-white px-4 py-2 rounded border border-red-500 shadow-lg text-xs font-bold uppercase tracking-widest backdrop-blur-sm flex items-center gap-2 transition-all hover:scale-105"
-                    >
-                      <span>🗑️</span> Clear Seals
-                    </button>
-                  )}
-                  <button
-                    onClick={debugTrigger}
-                    className="bg-blue-900/80 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-500 shadow-lg text-xs font-bold uppercase tracking-widest backdrop-blur-sm flex items-center gap-2 transition-all hover:scale-105"
-                  >
-                    <span>⚡</span> Debug: Instant Cast
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-
           {/* Video Feed */}
           <div className="relative w-full max-w-2xl mx-auto z-0">
-            <div className={`relative aspect-video bg-black rounded-lg overflow-hidden border-2 shadow-2xl group transition-colors duration-500 ${activeJutsu ? 'border-red-500 shadow-[0_0_30px_#f00]' : 'border-gray-700 hover:border-konoha-orange'}`}>
-
-              {/* VFX Layer (Simple Active Jutsu Overlay for now) */}
-              {activeJutsu && (
-                <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none animate-ping-slow">
-                  <h2 className="text-6xl font-bold text-white drop-shadow-[0_0_10px_rgba(255,0,0,0.8)] stroke-black tracking-widest font-ninja">
-                    {activeJutsu.name}
-                  </h2>
-                </div>
-              )}
+            <div className={`relative aspect-video bg-black rounded-lg overflow-hidden border-2 shadow-2xl group transition-colors duration-500 border-gray-700 hover:border-konoha-orange`}>
 
               <VideoFeed videoRef={videoRef} detections={detections} />
-
-              {/* VFX Overlay */}
-              <VFXCanvas
-                activeJutsu={activeJutsu}
-                faceState={faceState}
-                detections={detections}
-                width={640}
-                height={480}
-              />
 
               {/* Scanline effect */}
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent h-full w-full pointer-events-none animate-scan"></div>
@@ -152,14 +114,30 @@ function App() {
             </div>
           </div>
 
-          {/* Basic Mode UI: History & Editor */}
-          {mode === 'basic' && (
-            <BasicModeEditor
-              history={history}
-              editorText={editorText}
-              setEditorText={setEditorText}
-            />
-          )}
+          {/* Basic Mode UI: T9 Ninja Input Split Layout */}
+          <div className="flex-1 flex flex-row gap-4 min-h-0">
+            {/* Left Col: T9 Keyboard Reference */}
+            <div className="flex-1 flex flex-col gap-2 min-w-0 justify-center">
+              <div className="bg-gray-900 border border-gray-700 rounded-lg p-2 shadow-lg flex-1 flex flex-col justify-center">
+                <h3 className="text-x text-gray-500 font-mono text-center mb-2 uppercase tracking-widest">Ninja Keypad</h3>
+                <T9Keyboard activeSignId={detections.length > 0 ? detections[0].classId + 1 : null} />
+                <div className="text-center text-gray-600 text-[20px] font-mono mt-2">
+                  戌(0)=Space | 亥(1)=Next | 酉(*)=Del
+                </div>
+              </div>
+            </div>
+
+            {/* Right Col: Editor Result */}
+            <div className="flex-[1.5] min-w-0">
+              <T9EditorDisplay
+                {...t9State}
+                onTextChange={(text) => {
+                  t9EngineRef.current.setText(text);
+                  setT9State(t9EngineRef.current.getState());
+                }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Right Signs (Desktop) */}
@@ -168,7 +146,6 @@ function App() {
           signs={HAND_SIGNS.slice(7, 13)} // B: 7-12
           title="Hand Signs B"
         />
-
 
       </main>
     </div>
