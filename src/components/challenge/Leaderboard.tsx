@@ -141,7 +141,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                                             {entry.ninja_name}
                                         </span>
                                         {isPlayer && (
-                                            <span className="text-[10px] text-konoha-orange font-mono shrink-0">← You</span>
+                                            <span className="text-[10px] text-konoha-orange font-mono shrink-0">{t('leaderboard.you')}</span>
                                         )}
                                     </div>
 

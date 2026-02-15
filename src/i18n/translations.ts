@@ -1,10 +1,10 @@
 export type Locale = 'en' | 'zh' | 'ja' | 'fr';
 
-export const LOCALE_LABELS: Record<Locale, string> = {
-    en: 'EN',
-    zh: '中文',
-    ja: '日本語',
-    fr: 'FR',
+export const LOCALE_LABELS: Record<Locale, { flag: string; name: string; short: string }> = {
+    en: { flag: '🇺🇸', name: 'English', short: 'EN' },
+    zh: { flag: '🇨🇳', name: '中文', short: '中文' },
+    ja: { flag: '🇯🇵', name: '日本語', short: 'JA' },
+    fr: { flag: '🇫🇷', name: 'Français', short: 'FR' },
 };
 
 export const LOCALES: Locale[] = ['en', 'zh', 'ja', 'fr'];
@@ -27,6 +27,9 @@ export const translations = {
         // T9 Mode
         't9.keypad': 'Ninja Keypad',
         't9.hint': '戌=Space | 亥=Next | 酉=Del',
+        't9.placeholder': 'Type here or use hand signs...',
+        't9.seals': 'Seals:',
+        't9.input': 'INPUT:',
         't9.status.active': 'ACTIVE',
         't9.status.standby': 'STANDBY',
 
@@ -68,6 +71,7 @@ export const translations = {
         'leaderboard.ninja': 'Ninja',
         'leaderboard.time': 'Time',
         'leaderboard.level': 'Level',
+        'leaderboard.you': '← You',
     },
 
     // ───────── 中文 ─────────
@@ -82,6 +86,9 @@ export const translations = {
 
         't9.keypad': '忍者键盘',
         't9.hint': '戌=空格 | 亥=下一个 | 酉=删除',
+        't9.placeholder': '在此输入或使用手势结印...',
+        't9.seals': '结印：',
+        't9.input': '输入：',
         't9.status.active': '运行中',
         't9.status.standby': '待命',
 
@@ -119,6 +126,7 @@ export const translations = {
         'leaderboard.ninja': '忍者',
         'leaderboard.time': '时间',
         'leaderboard.level': '等级',
+        'leaderboard.you': '← 你',
     },
 
     // ───────── 日本語 ─────────
@@ -133,6 +141,9 @@ export const translations = {
 
         't9.keypad': '忍者キーパッド',
         't9.hint': '戌=Space | 亥=Next | 酉=Del',
+        't9.placeholder': 'ここに入力するか手印を使用...',
+        't9.seals': '印：',
+        't9.input': '入力：',
         't9.status.active': '稼働中',
         't9.status.standby': 'スタンバイ',
 
@@ -170,6 +181,7 @@ export const translations = {
         'leaderboard.ninja': '忍者',
         'leaderboard.time': 'タイム',
         'leaderboard.level': 'レベル',
+        'leaderboard.you': '← あなた',
     },
 
     // ───────── Français ─────────
@@ -184,6 +196,9 @@ export const translations = {
 
         't9.keypad': 'Clavier Ninja',
         't9.hint': '戌=Espace | 亥=Suivant | 酉=Suppr',
+        't9.placeholder': 'Tapez ici ou utilisez les signes...',
+        't9.seals': 'Sceaux :',
+        't9.input': 'ENTRÉE :',
         't9.status.active': 'ACTIF',
         't9.status.standby': 'EN ATTENTE',
 
@@ -221,5 +236,6 @@ export const translations = {
         'leaderboard.ninja': 'Ninja',
         'leaderboard.time': 'Temps',
         'leaderboard.level': 'Niveau',
+        'leaderboard.you': '← Vous',
     },
 } as const;

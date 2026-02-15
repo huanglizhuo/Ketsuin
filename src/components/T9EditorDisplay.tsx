@@ -4,6 +4,7 @@ import React from 'react';
 import { T9Keyboard } from './T9Keyboard';
 import classNames from 'classnames';
 import { HAND_SIGNS } from '../config/data';
+import { useI18n } from '../i18n/I18nContext';
 
 interface T9InputState {
     committedText: string;
@@ -25,6 +26,7 @@ export const T9EditorDisplay: React.FC<T9InputState> = ({
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
     const mirrorRef = React.useRef<HTMLDivElement>(null);
     const [selectionEnd, setSelectionEnd] = React.useState(0);
+    const { t } = useI18n();
 
     // Sync Scroll
     const handleScroll = () => {
@@ -94,14 +96,14 @@ export const T9EditorDisplay: React.FC<T9InputState> = ({
                 {/* Placeholder (Only if empty) */}
                 {committedText.length === 0 && (
                     <div className="absolute inset-0 p-4 font-mono text-lg text-gray-500 pointer-events-none">
-                        Type here or use hand signs...
+                        {t('t9.placeholder')}
                     </div>
                 )}
             </div>
 
             {/* Gesture Input List (Reverse Mapped) */}
             <div className="flex-1 bg-black/20 p-2 overflow-x-auto flex items-center gap-2 border-b border-t border-white/10 min-h-[60px] shrink-0">
-                <span className="text-xs text-gray-500 font-mono shrink-0 uppercase tracking-widest mr-2">Seals:</span>
+                <span className="text-xs text-gray-500 font-mono shrink-0 uppercase tracking-widest mr-2">{t('t9.seals')}</span>
                 {fullSignSequence.map((signId, i) => {
                     const sign = HAND_SIGNS.find(s => s.id === signId);
                     return (
@@ -119,7 +121,7 @@ export const T9EditorDisplay: React.FC<T9InputState> = ({
 
             {/* Candidate Bar (Bottom of Editor) */}
             <div className="bg-black/40 border-t border-white/10 p-2 flex items-center gap-3 overflow-x-auto shrink-0">
-                <span className="text-xs text-gray-500 font-mono">INPUT:</span>
+                <span className="text-xs text-gray-500 font-mono">{t('t9.input')}</span>
                 <span className="text-konoha-orange font-bold font-mono tracking-widest min-w-[20px]">{currentSequence}</span>
 
                 {/* Candidates */}

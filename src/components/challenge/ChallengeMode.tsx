@@ -59,9 +59,9 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
         };
     }, [stop]);
 
-    // Auto-start camera when countdown finishes (phase goes to 'active')
+    // Auto-start camera when countdown begins (so model warms up before timer starts)
     useEffect(() => {
-        if (state.phase === 'active' && !isRunning) {
+        if (state.phase === 'countdown' && !isRunning) {
             autoStartedRef.current = true;
             start();
         }

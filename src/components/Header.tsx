@@ -1,8 +1,7 @@
 import React from 'react';
 import type { AppMode } from '../App';
 import { useI18n } from '../i18n/I18nContext';
-import { LOCALE_LABELS, LOCALES } from '../i18n/translations';
-import type { Locale } from '../i18n/translations';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface HeaderProps {
     loading: boolean;
@@ -16,8 +15,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start, stop, appMode, onModeChange }) => {
     const [showTooltip, setShowTooltip] = React.useState(false);
-    const [showLangMenu, setShowLangMenu] = React.useState(false);
-    const { locale, setLocale, t } = useI18n();
+    const { t } = useI18n();
 
     React.useEffect(() => {
         const hasStarted = localStorage.getItem('ketsuin_started');
@@ -31,14 +29,6 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
         setShowTooltip(false);
         start();
     };
-
-    // Close language menu when clicking outside
-    React.useEffect(() => {
-        if (!showLangMenu) return;
-        const handler = () => setShowLangMenu(false);
-        window.addEventListener('click', handler);
-        return () => window.removeEventListener('click', handler);
-    }, [showLangMenu]);
 
     return (
         <header className="px-6 py-3 bg-transparent flex flex-col z-10 relative">
@@ -55,7 +45,7 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                     </h1>
                 </div>
 
-                <div className="flex items-center gap-4 relative">
+                <div className="flex items-center gap-4">
                     <button
                         onClick={isRunning ? stop : handleStart}
                         disabled={loading}
@@ -86,33 +76,8 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                         )}
                     </button>
 
-                    {/* Language Selector */}
-                    <div className="relative">
-                        <button
-                            onClick={(e) => { e.stopPropagation(); setShowLangMenu(!showLangMenu); }}
-                            className="px-2 py-1.5 bg-black/40 border border-white/20 rounded text-xs font-mono text-gray-300
-                                       hover:border-konoha-orange/50 hover:text-white transition-all duration-200"
-                            title="Language"
-                        >
-                            🌐 {LOCALE_LABELS[locale]}
-                        </button>
-                        {showLangMenu && (
-                            <div className="absolute top-full right-0 mt-1 bg-gray-900 border border-white/20 rounded shadow-lg z-50 overflow-hidden min-w-[80px]">
-                                {LOCALES.map((l: Locale) => (
-                                    <button
-                                        key={l}
-                                        onClick={(e) => { e.stopPropagation(); setLocale(l); setShowLangMenu(false); }}
-                                        className={`block w-full px-3 py-1.5 text-xs font-mono text-left transition-colors
-                                            ${l === locale
-                                                ? 'bg-konoha-orange/20 text-konoha-orange font-bold'
-                                                : 'text-gray-300 hover:bg-white/10 hover:text-white'}`}
-                                    >
-                                        {LOCALE_LABELS[l]}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                    {/* Language Switcher */}
+                    <LanguageSwitcher />
 
                     <a
                         href="https://github.com/huanglizhuo/Ketsuin"
