@@ -1,18 +1,47 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useI18n } from '../i18n/I18nContext';
 import { LOCALE_LABELS, LOCALES } from '../i18n/translations';
 import type { Locale } from '../i18n/translations';
 
 export const LanguageSwitcher: React.FC = () => {
     const [open, setOpen] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const [pos, setPos] = useState({ top: 0, right: 0 });
     const { locale, setLocale } = useI18n();
+
+    // Calculate dropdown position from button rect
+    const updatePosition = useCallback(() => {
+        if (!buttonRef.current) return;
+        const rect = buttonRef.current.getBoundingClientRect();
+        setPos({
+            top: rect.bottom + 6, // 6px gap
+            right: window.innerWidth - rect.right,
+        });
+    }, []);
+
+    // Reposition on scroll/resize while open
+    useEffect(() => {
+        if (!open) return;
+        updatePosition();
+        window.addEventListener('scroll', updatePosition, true);
+        window.addEventListener('resize', updatePosition);
+        return () => {
+            window.removeEventListener('scroll', updatePosition, true);
+            window.removeEventListener('resize', updatePosition);
+        };
+    }, [open, updatePosition]);
 
     // Close on click outside
     useEffect(() => {
         if (!open) return;
         const handler = (e: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+            const target = e.target as Node;
+            if (
+                buttonRef.current && !buttonRef.current.contains(target) &&
+                dropdownRef.current && !dropdownRef.current.contains(target)
+            ) {
                 setOpen(false);
             }
         };
@@ -33,9 +62,10 @@ export const LanguageSwitcher: React.FC = () => {
     const current = LOCALE_LABELS[locale];
 
     return (
-        <div ref={containerRef} className="relative">
+        <>
             {/* Toggle Button */}
             <button
+                ref={buttonRef}
                 onClick={() => setOpen(prev => !prev)}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 bg-black/40 border border-white/20 rounded
                            text-xs font-mono text-gray-300
@@ -49,12 +79,14 @@ export const LanguageSwitcher: React.FC = () => {
                 <span className={`text-[8px] leading-none transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>▼</span>
             </button>
 
-            {/* Dropdown */}
-            {open && (
+            {/* Portal Dropdown — rendered at document.body, escapes all stacking contexts */}
+            {open && createPortal(
                 <div
-                    className="absolute top-full right-0 mt-1.5 bg-gray-900/95 backdrop-blur-md
+                    ref={dropdownRef}
+                    className="fixed bg-gray-900/95 backdrop-blur-md
                                border border-white/20 rounded-lg shadow-[0_8px_30px_rgba(0,0,0,0.5)]
-                               overflow-hidden min-w-[140px] z-[100]"
+                               overflow-hidden min-w-[140px]"
+                    style={{ top: pos.top, right: pos.right, zIndex: 9999 }}
                     role="listbox"
                     aria-activedescendant={`lang-${locale}`}
                 >
@@ -80,8 +112,9 @@ export const LanguageSwitcher: React.FC = () => {
                             </button>
                         );
                     })}
-                </div>
+                </div>,
+                document.body
             )}
-        </div>
+        </>
     );
 };

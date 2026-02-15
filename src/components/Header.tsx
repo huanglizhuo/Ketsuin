@@ -31,13 +31,13 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
     };
 
     return (
-        <header className="px-6 py-3 bg-transparent flex flex-col z-20 relative">
+        <header className="px-6 py-3 bg-transparent flex flex-col z-10 relative">
             {/* Fullscreen Backdrop for First Time Tooltip */}
             {showTooltip && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-500 pointer-events-none" />
             )}
 
-            <div className="flex justify-between items-center relative z-[60]">
+            <div className="flex justify-between items-center relative">
                 <div className="flex items-center gap-3">
                     <img src={`${import.meta.env.BASE_URL}asset/ketsuin.png`} alt="Ketsuin Logo" className="w-10 h-10 object-contain drop-shadow-md" />
                     <h1 className="text-2xl md:text-3xl text-konoha-orange font-bold tracking-wider text-gray-100 font-ninja drop-shadow-md">
