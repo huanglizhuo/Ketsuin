@@ -38,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                 <div className="flex items-center gap-3">
                     <img src={`${import.meta.env.BASE_URL}asset/ketsuin.png`} alt="Ketsuin Logo" className="w-10 h-10 object-contain drop-shadow-md" />
                     <h1 className="text-2xl md:text-3xl text-konoha-orange font-bold tracking-wider text-gray-100 font-ninja drop-shadow-md">
-                        结印 keyboard
+                        结印-KeTsuIn
                     </h1>
                 </div>
 
@@ -62,14 +62,13 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                             <span className="flex items-center gap-2 text-xs md:text-sm whitespace-nowrap">
                                 <span className="text-lg">🚫</span> {error}
                             </span>
-                        ) : loading ? 'Gathering Chakra...' : isRunning ? 'Release Jutsu' : '結印 Start'}
+                        ) : loading ? 'Gathering Chakra...' : isRunning ? 'Release Jutsu' : 'Start'}
 
                         {/* Tooltip for first-time users */}
                         {showTooltip && !loading && !isRunning && (
                             <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 w-40 p-2 bg-konoha-orange text-black font-bold text-xs rounded text-center shadow-[0_0_10px_#F2A900] animate-bounce pointer-events-none z-50">
                                 <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 rotate-45 w-2 h-2 bg-konoha-orange"></div>
                                 Click to Start 结印!
-
                             </div>
                         )}
                     </button>
