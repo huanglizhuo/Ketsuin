@@ -3,6 +3,7 @@ import { SUPPORTED_JUTSUS, NINJA_RANKS } from '../../config/data';
 import type { NinjaRank } from '../../config/data';
 import { fetchLeaderboard, isSupabaseConfigured } from '../../core/supabase';
 import type { LeaderboardEntry } from '../../core/supabase';
+import { useI18n } from '../../i18n/I18nContext';
 
 interface LeaderboardProps {
     initialJutsuId?: string;
@@ -23,6 +24,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
     const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { t } = useI18n();
 
     useEffect(() => {
         loadLeaderboard(selectedJutsuId);
@@ -35,7 +37,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
             const data = await fetchLeaderboard(jutsuId, 50);
             setEntries(data);
         } catch (err) {
-            setError('排行榜加载失败');
+            setError(t('leaderboard.loadError'));
         } finally {
             setLoading(false);
         }
@@ -48,19 +50,19 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h2 className="text-2xl text-konoha-orange font-ninja drop-shadow-[0_0_8px_rgba(242,169,0,0.4)]">
-                    🏆 忍者排行榜
+                    {t('leaderboard.title')}
                 </h2>
                 <button
                     onClick={onBack}
                     className="text-sm text-gray-400 hover:text-white font-mono transition-colors"
                 >
-                    ← 戻る
+                    {t('leaderboard.back')}
                 </button>
             </div>
 
             {/* Data source indicator */}
             <p className="text-[10px] text-gray-600 font-mono">
-                {isSupabaseConfigured() ? '🌐 GLOBAL LEADERBOARD' : '💾 LOCAL ONLY'}
+                {isSupabaseConfigured() ? t('leaderboard.global') : t('leaderboard.local')}
             </p>
 
             {/* Jutsu Tabs */}
@@ -83,7 +85,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
             {/* Jutsu Info */}
             {selectedJutsu && (
                 <div className="text-center text-xs text-gray-500 font-mono">
-                    {selectedJutsu.nameEn} · {selectedJutsu.sequence.length} Seals · {'⭐'.repeat(selectedJutsu.difficulty)}
+                    {selectedJutsu.nameEn} · {selectedJutsu.sequence.length} {t('jutsu.seals')} · {'⭐'.repeat(selectedJutsu.difficulty)}
                 </div>
             )}
 
@@ -91,23 +93,23 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
             <div className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden">
                 {loading ? (
                     <div className="p-8 text-center text-gray-500 font-mono animate-pulse">
-                        チャクラ集中中...
+                        {t('leaderboard.loading')}
                     </div>
                 ) : error ? (
                     <div className="p-8 text-center text-red-400 font-mono">{error}</div>
                 ) : entries.length === 0 ? (
                     <div className="p-8 text-center text-gray-500 font-mono">
-                        <p className="text-lg mb-1">まだ記録なし</p>
-                        <p className="text-xs">Be the first ninja to conquer this jutsu!</p>
+                        <p className="text-lg mb-1">{t('leaderboard.empty')}</p>
+                        <p className="text-xs">{t('leaderboard.emptyHint')}</p>
                     </div>
                 ) : (
                     <div className="divide-y divide-white/5">
                         {/* Header Row */}
                         <div className="grid grid-cols-[50px_1fr_80px_80px] px-4 py-2 text-[10px] text-gray-600 font-mono uppercase">
-                            <span>Rank</span>
-                            <span>Ninja</span>
-                            <span className="text-right">Time</span>
-                            <span className="text-right">Level</span>
+                            <span>{t('leaderboard.rank')}</span>
+                            <span>{t('leaderboard.ninja')}</span>
+                            <span className="text-right">{t('leaderboard.time')}</span>
+                            <span className="text-right">{t('leaderboard.level')}</span>
                         </div>
 
                         {/* Entries */}

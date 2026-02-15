@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { HAND_SIGNS } from '../../config/data';
 import type { ChallengeState } from '../../core/ChallengeEngine';
+import { useI18n } from '../../i18n/I18nContext';
 
 interface ChallengeArenaProps {
     state: ChallengeState;
@@ -12,6 +13,7 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children 
     const [displayTime, setDisplayTime] = useState('0.000');
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const startRef = useRef(0);
+    const { t } = useI18n();
 
     // Live timer during active phase
     useEffect(() => {
@@ -102,7 +104,7 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children 
                         </span>
                         {lastError && (
                             <span className="text-red-400 text-xs font-mono mt-1 animate-pulse">
-                                やり直し！
+                                {t('arena.retry')}
                             </span>
                         )}
                     </div>
@@ -167,7 +169,7 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children 
                     {/* Count */}
                     <div className="text-center mt-1">
                         <span className="text-xs text-gray-500 font-mono">
-                            {currentSignIndex} / {totalSigns} SEALS
+                            {currentSignIndex} / {totalSigns} {t('jutsu.seals')}
                         </span>
                     </div>
                 </div>

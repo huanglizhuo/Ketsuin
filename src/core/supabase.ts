@@ -20,22 +20,31 @@ export interface LeaderboardEntry {
 
 // --- Supabase Client ---
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL || '').trim();
+const SUPABASE_ANON_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim();
 
 let supabase: SupabaseClient | null = null;
 
+function isValidConfig(): boolean {
+    return SUPABASE_URL.startsWith('https://') && SUPABASE_ANON_KEY.length > 20;
+}
+
 function getClient(): SupabaseClient | null {
     if (supabase) return supabase;
-    if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-        supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        return supabase;
+    if (isValidConfig()) {
+        try {
+            supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            return supabase;
+        } catch (err) {
+            console.warn('Supabase client creation failed:', err);
+            return null;
+        }
     }
     return null;
 }
 
 export function isSupabaseConfigured(): boolean {
-    return !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+    return isValidConfig();
 }
 
 // --- Supabase Operations ---
@@ -47,7 +56,7 @@ export async function submitScore(entry: Omit<LeaderboardEntry, 'id' | 'created_
         try {
             const { error } = await client.from('leaderboard').insert([entry]);
             if (error) {
-                console.error('Supabase insert error:', error);
+                console.error('Supabase insert error:', error.message, error.details, error.hint, error.code, error);
                 // Fall back to localStorage
                 saveToLocalStorage(entry);
                 return false;
@@ -56,7 +65,7 @@ export async function submitScore(entry: Omit<LeaderboardEntry, 'id' | 'created_
             saveToLocalStorage(entry);
             return true;
         } catch (err) {
-            console.error('Supabase network error:', err);
+            console.error('Supabase network error:', err instanceof Error ? err.message : err, err);
             saveToLocalStorage(entry);
             return false;
         }
@@ -87,7 +96,7 @@ export async function fetchLeaderboard(
                 return data as LeaderboardEntry[];
             }
         } catch (err) {
-            console.error('Supabase fetch error:', err);
+            console.error('Supabase fetch error:', err instanceof Error ? err.message : err, err);
         }
     }
 
@@ -114,7 +123,7 @@ export async function fetchPlayerRank(
                 return count + 1; // 1-based rank
             }
         } catch (err) {
-            console.error('Supabase rank error:', err);
+            console.error('Supabase rank error:', err instanceof Error ? err.message : err, err);
         }
     }
 

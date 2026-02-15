@@ -1,5 +1,8 @@
 import React from 'react';
 import type { AppMode } from '../App';
+import { useI18n } from '../i18n/I18nContext';
+import { LOCALE_LABELS, LOCALES } from '../i18n/translations';
+import type { Locale } from '../i18n/translations';
 
 interface HeaderProps {
     loading: boolean;
@@ -13,6 +16,8 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start, stop, appMode, onModeChange }) => {
     const [showTooltip, setShowTooltip] = React.useState(false);
+    const [showLangMenu, setShowLangMenu] = React.useState(false);
+    const { locale, setLocale, t } = useI18n();
 
     React.useEffect(() => {
         const hasStarted = localStorage.getItem('ketsuin_started');
@@ -27,6 +32,14 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
         start();
     };
 
+    // Close language menu when clicking outside
+    React.useEffect(() => {
+        if (!showLangMenu) return;
+        const handler = () => setShowLangMenu(false);
+        window.addEventListener('click', handler);
+        return () => window.removeEventListener('click', handler);
+    }, [showLangMenu]);
+
     return (
         <header className="px-6 py-3 bg-transparent flex flex-col z-10 relative">
             {/* Fullscreen Backdrop for First Time Tooltip */}
@@ -34,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-500 pointer-events-none" />
             )}
 
-            <div className="flex justify-between items-center relative z-50">
+            <div className="flex justify-between items-center relative z-[60]">
                 <div className="flex items-center gap-3">
                     <img src={`${import.meta.env.BASE_URL}asset/ketsuin.png`} alt="Ketsuin Logo" className="w-10 h-10 object-contain drop-shadow-md" />
                     <h1 className="text-2xl md:text-3xl text-konoha-orange font-bold tracking-wider text-gray-100 font-ninja drop-shadow-md">
@@ -62,16 +75,44 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                             <span className="flex items-center gap-2 text-xs md:text-sm whitespace-nowrap">
                                 <span className="text-lg">🚫</span> {error}
                             </span>
-                        ) : loading ? 'Gathering Chakra...' : isRunning ? 'Release Jutsu' : 'Start'}
+                        ) : loading ? t('header.loading') : isRunning ? t('header.stop') : t('header.start')}
 
                         {/* Tooltip for first-time users */}
                         {showTooltip && !loading && !isRunning && (
                             <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 w-40 p-2 bg-konoha-orange text-black font-bold text-xs rounded text-center shadow-[0_0_10px_#F2A900] animate-bounce pointer-events-none z-50">
                                 <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 rotate-45 w-2 h-2 bg-konoha-orange"></div>
-                                Click to Start 结印!
+                                {t('header.tooltip')}
                             </div>
                         )}
                     </button>
+
+                    {/* Language Selector */}
+                    <div className="relative">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setShowLangMenu(!showLangMenu); }}
+                            className="px-2 py-1.5 bg-black/40 border border-white/20 rounded text-xs font-mono text-gray-300
+                                       hover:border-konoha-orange/50 hover:text-white transition-all duration-200"
+                            title="Language"
+                        >
+                            🌐 {LOCALE_LABELS[locale]}
+                        </button>
+                        {showLangMenu && (
+                            <div className="absolute top-full right-0 mt-1 bg-gray-900 border border-white/20 rounded shadow-lg z-50 overflow-hidden min-w-[80px]">
+                                {LOCALES.map((l: Locale) => (
+                                    <button
+                                        key={l}
+                                        onClick={(e) => { e.stopPropagation(); setLocale(l); setShowLangMenu(false); }}
+                                        className={`block w-full px-3 py-1.5 text-xs font-mono text-left transition-colors
+                                            ${l === locale
+                                                ? 'bg-konoha-orange/20 text-konoha-orange font-bold'
+                                                : 'text-gray-300 hover:bg-white/10 hover:text-white'}`}
+                                    >
+                                        {LOCALE_LABELS[l]}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
                     <a
                         href="https://github.com/huanglizhuo/Ketsuin"
@@ -97,7 +138,7 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                             : 'text-gray-500 hover:text-gray-300 border border-transparent'
                         }`}
                 >
-                    T9 入力
+                    {t('header.tab.t9')}
                 </button>
                 <button
                     onClick={() => onModeChange('challenge')}
@@ -107,7 +148,7 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                             : 'text-gray-500 hover:text-gray-300 border border-transparent'
                         }`}
                 >
-                    🔥 挑戦モード
+                    {t('header.tab.challenge')}
                 </button>
                 <button
                     onClick={() => onModeChange('ranking')}
@@ -117,7 +158,7 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                             : 'text-gray-500 hover:text-gray-300 border border-transparent'
                         }`}
                 >
-                    🏆 排行榜
+                    {t('header.tab.ranking')}
                 </button>
             </div>
         </header>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { HAND_SIGNS, SUPPORTED_JUTSUS } from '../../config/data';
 import type { Jutsu } from '../../config/data';
+import { useI18n } from '../../i18n/I18nContext';
 
 interface JutsuSelectProps {
     onSelect: (jutsu: Jutsu) => void;
@@ -9,13 +10,15 @@ interface JutsuSelectProps {
 const difficultyStars = (d: number) => '⭐'.repeat(d);
 
 export const JutsuSelect: React.FC<JutsuSelectProps> = ({ onSelect }) => {
+    const { t } = useI18n();
+
     return (
         <div className="flex flex-col gap-4 w-full max-w-4xl mx-auto">
             <h2 className="text-2xl md:text-3xl text-konoha-orange font-ninja text-center drop-shadow-[0_0_10px_rgba(242,169,0,0.5)]">
-                忍術を選べ — 選擇忍術
+                {t('jutsu.title')}
             </h2>
             <p className="text-gray-400 text-center text-sm font-mono">
-                Select a jutsu to challenge your seal speed
+                {t('jutsu.subtitle')}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
@@ -73,10 +76,10 @@ export const JutsuSelect: React.FC<JutsuSelectProps> = ({ onSelect }) => {
                         {/* Seal count */}
                         <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5">
                             <span className="text-xs text-gray-500 font-mono">
-                                {jutsu.sequence.length} SEALS
+                                {jutsu.sequence.length} {t('jutsu.seals')}
                             </span>
                             <span className="text-xs text-konoha-orange/50 font-mono uppercase tracking-wider group-hover:text-konoha-orange transition-colors">
-                                Challenge →
+                                {t('jutsu.challenge')}
                             </span>
                         </div>
                     </button>

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { useI18n } from './i18n/I18nContext';
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useDetector } from './hooks/useDetector';
@@ -18,6 +19,7 @@ const signManager = new SignManager();
 
 function App() {
   const { loading, isRunning, start, stop, detections, videoRef, error } = useDetector();
+  const { t } = useI18n();
 
   // App Mode
   const [appMode, setAppMode] = useState<AppMode>('t9');
@@ -178,7 +180,7 @@ function App() {
 
               {/* Status Indicator */}
               <div className="absolute top-4 left-4 px-2 py-1 bg-black/80 border border-green-500 text-green-500 text-xs font-mono rounded backdrop-blur-sm shadow flex flex-col gap-1">
-                <span>SYS: {isRunning ? 'ACTIVE' : 'STANDBY'}</span>
+                <span>SYS: {isRunning ? t('t9.status.active') : t('t9.status.standby')}</span>
               </div>
             </div>
 
@@ -187,10 +189,10 @@ function App() {
               {/* Left Col: T9 Keyboard Reference */}
               <div className="flex-1 flex flex-col gap-2 min-w-0 justify-center order-2 md:order-1">
                 <div className="rounded-lg p-2 flex-1 flex flex-col justify-center backdrop-blur-sm bg-black/30 border border-white/10">
-                  <h3 className="text-x text-gray-400 font-mono text-center mb-2 uppercase tracking-widest text-shadow">Ninja Keypad</h3>
+                  <h3 className="text-x text-gray-400 font-mono text-center mb-2 uppercase tracking-widest text-shadow">{t('t9.keypad')}</h3>
                   <T9Keyboard activeSignId={detections.length > 0 ? detections[0].classId + 1 : null} />
                   <div className="text-center text-gray-400 text-[20px] font-mono mt-2 text-shadow">
-                    戌=Space | 亥=Next | 酉=Del
+                    {t('t9.hint')}
                   </div>
                 </div>
               </div>

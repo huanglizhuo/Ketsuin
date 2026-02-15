@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CHALLENGE_QUOTES } from '../../config/data';
 import type { ChallengeResult as ChallengeResultType } from '../../core/ChallengeEngine';
 import { submitScore, fetchPlayerRank } from '../../core/supabase';
+import { useI18n } from '../../i18n/I18nContext';
 
 interface ChallengeResultProps {
     result: ChallengeResultType;
@@ -21,6 +22,7 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
     const [submitting, setSubmitting] = useState(false);
     const [playerRank, setPlayerRank] = useState<number | null>(null);
     const [error, setError] = useState('');
+    const { t } = useI18n();
 
     // Random quote
     const quote = CHALLENGE_QUOTES[Math.floor(Math.random() * CHALLENGE_QUOTES.length)];
@@ -28,7 +30,7 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
     const handleSubmit = async () => {
         const trimmed = ninjaName.trim();
         if (trimmed.length < 1 || trimmed.length > 12) {
-            setError('忍者名は1〜12文字で入力してください');
+            setError(t('result.nameError'));
             return;
         }
 
@@ -49,7 +51,7 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
             setPlayerRank(rank);
             setSubmitted(true);
         } catch (err) {
-            setError('提交失敗，但成績已保存到本地');
+            setError(t('result.submitError'));
             setSubmitted(true);
         } finally {
             setSubmitting(false);
@@ -89,19 +91,19 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
                         <p className="text-2xl text-white font-mono font-bold">
                             {(result.timeMs / 1000).toFixed(3)}
                         </p>
-                        <p className="text-[10px] text-gray-500 font-mono uppercase">Time (s)</p>
+                        <p className="text-[10px] text-gray-500 font-mono uppercase">{t('result.time')}</p>
                     </div>
                     <div>
                         <p className="text-2xl text-white font-mono font-bold">
                             {result.signCount}
                         </p>
-                        <p className="text-[10px] text-gray-500 font-mono uppercase">Seals</p>
+                        <p className="text-[10px] text-gray-500 font-mono uppercase">{t('result.seals')}</p>
                     </div>
                     <div>
                         <p className="text-2xl text-white font-mono font-bold">
                             {result.secondsPerSign.toFixed(2)}
                         </p>
-                        <p className="text-[10px] text-gray-500 font-mono uppercase">s/seal</p>
+                        <p className="text-[10px] text-gray-500 font-mono uppercase">{t('result.sealSpeed')}</p>
                     </div>
                 </div>
 
@@ -115,7 +117,7 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
                 {submitted && playerRank && (
                     <div className="bg-konoha-orange/10 border border-konoha-orange/30 rounded p-2 mb-4">
                         <p className="text-konoha-orange font-mono text-sm">
-                            全球排名: <span className="text-lg font-bold">#{playerRank}</span>
+                            {t('result.globalRank')} <span className="text-lg font-bold">#{playerRank}</span>
                         </p>
                     </div>
                 )}
@@ -125,7 +127,7 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
             {!submitted ? (
                 <div className="w-full bg-black/30 backdrop-blur-sm border border-white/10 rounded-lg p-4">
                     <label className="text-sm text-gray-400 font-mono block mb-2">
-                        忍者名を入力 (Enter Ninja Name)
+                        {t('result.ninjaNameLabel')}
                     </label>
                     <div className="flex gap-2">
                         <input
@@ -145,18 +147,18 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
                          hover:bg-konoha-orange/80 disabled:opacity-40 disabled:cursor-not-allowed
                          transition-all duration-200 font-mono text-sm"
                         >
-                            {submitting ? '提出中...' : '提交成績'}
+                            {submitting ? t('result.submitting') : t('result.submit')}
                         </button>
                     </div>
                     {error && (
                         <p className="text-red-400 text-xs mt-2 font-mono">{error}</p>
                     )}
                     <p className="text-[10px] text-gray-600 mt-1 font-mono">
-                        1〜12文字 · 日本語/中文/English OK
+                        {t('result.ninjaNameHint')}
                     </p>
                 </div>
             ) : (
-                <p className="text-green-400 text-sm font-mono">✓ 成績提出完了!</p>
+                <p className="text-green-400 text-sm font-mono">{t('result.submitted')}</p>
             )}
 
             {/* Action Buttons */}
@@ -166,21 +168,21 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
                     className="px-5 py-2 border border-konoha-orange text-konoha-orange rounded font-mono text-sm
                      hover:bg-konoha-orange hover:text-black transition-all duration-200"
                 >
-                    再挑戦
+                    {t('result.retry')}
                 </button>
                 <button
                     onClick={onViewLeaderboard}
                     className="px-5 py-2 border border-white/20 text-gray-300 rounded font-mono text-sm
                      hover:border-white/40 hover:text-white transition-all duration-200"
                 >
-                    排行榜
+                    {t('result.leaderboard')}
                 </button>
                 <button
                     onClick={onBackToSelect}
                     className="px-5 py-2 border border-white/10 text-gray-500 rounded font-mono text-sm
                      hover:border-white/20 hover:text-gray-300 transition-all duration-200"
                 >
-                    忍術選択へ
+                    {t('result.backToSelect')}
                 </button>
             </div>
         </div>
