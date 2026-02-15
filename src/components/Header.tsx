@@ -31,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
     };
 
     return (
-        <header className="px-6 py-3 bg-transparent flex flex-col z-10 relative">
+        <header className="px-6 py-3 bg-transparent flex flex-col z-20 relative">
             {/* Fullscreen Backdrop for First Time Tooltip */}
             {showTooltip && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-500 pointer-events-none" />
