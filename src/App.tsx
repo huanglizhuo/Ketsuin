@@ -9,11 +9,17 @@ import { T9Keyboard } from './components/T9Keyboard';
 import { SignManager } from './core/SignManager';
 import { T9Engine } from './core/T9Engine';
 import { SignOverlay } from './components/SignOverlay';
+import { ChallengeMode } from './components/challenge/ChallengeMode';
+
+export type AppMode = 't9' | 'challenge';
 
 const signManager = new SignManager();
 
 function App() {
   const { loading, isRunning, start, stop, detections, videoRef, error } = useDetector();
+
+  // App Mode
+  const [appMode, setAppMode] = useState<AppMode>('t9');
 
   // T9 Engine State
   const t9EngineRef = useRef(new T9Engine());
@@ -30,8 +36,10 @@ function App() {
   const cycleHoldStartRef = useRef<number | null>(null);
   const nextCycleTimeRef = useRef<number>(0);
 
-  // Unified Processing Effect
+  // Unified Processing Effect (T9 mode only)
   useEffect(() => {
+    if (appMode !== 't9') return; // Skip T9 processing in challenge mode
+
     if (detections.length > 0) {
       const best = detections[0];
       const signId = best.classId + 1; // 0->1 mapping
@@ -108,7 +116,7 @@ function App() {
         // Optional: Clear T9 sequence on timeout? 
       }
     }
-  }, [detections]);
+  }, [detections, appMode]);
 
   return (
     <div className="min-h-screen bg-ninja-black text-gray-200 font-sans flex flex-col overflow-hidden relative">
@@ -132,55 +140,66 @@ function App() {
         error={error}
         start={start}
         stop={stop}
+        appMode={appMode}
+        onModeChange={setAppMode}
       />
 
       {/* Main Layout */}
       <main className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden relative z-10">
 
-        {/* Center Content */}
-        <div className="flex-1 flex flex-col gap-4 p-4 min-w-0 overflow-visible md:overflow-y-auto relative order-1 md:order-2">
+        {appMode === 'challenge' ? (
+          /* Challenge Mode */
+          <ChallengeMode
+            videoRef={videoRef}
+            detections={detections}
+            isRunning={isRunning}
+          />
+        ) : (
+          /* T9 Mode — Center Content */
+          <div className="flex-1 flex flex-col gap-4 p-4 min-w-0 overflow-visible md:overflow-y-auto relative order-1 md:order-2">
 
-          {/* Video Feed */}
-          <div className="relative w-full max-w-2xl mx-auto z-0 shrink-0">
-            <div className={`relative aspect-video bg-black rounded-lg overflow-hidden border-2 shadow-2xl group transition-colors duration-500 border-gray-700 hover:border-konoha-orange`}>
+            {/* Video Feed */}
+            <div className="relative w-full max-w-2xl mx-auto z-0 shrink-0">
+              <div className={`relative aspect-video bg-black rounded-lg overflow-hidden border-2 shadow-2xl group transition-colors duration-500 border-gray-700 hover:border-konoha-orange`}>
 
-              <VideoFeed videoRef={videoRef} detections={detections} />
+                <VideoFeed videoRef={videoRef} detections={detections} />
 
-              {/* Scanline effect */}
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent h-full w-full pointer-events-none animate-scan"></div>
-            </div>
+                {/* Scanline effect */}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent h-full w-full pointer-events-none animate-scan"></div>
+              </div>
 
-            {/* Status Indicator */}
-            <div className="absolute top-4 left-4 px-2 py-1 bg-black/80 border border-green-500 text-green-500 text-xs font-mono rounded backdrop-blur-sm shadow flex flex-col gap-1">
-              <span>SYS: {isRunning ? 'ACTIVE' : 'STANDBY'}</span>
-            </div>
-          </div>
-
-          {/* Basic Mode UI: T9 Ninja Input Split Layout */}
-          <div className="flex-1 flex flex-col md:flex-row gap-4 min-h-0 shrink-0">
-            {/* Left Col: T9 Keyboard Reference */}
-            <div className="flex-1 flex flex-col gap-2 min-w-0 justify-center order-2 md:order-1">
-              <div className="rounded-lg p-2 flex-1 flex flex-col justify-center backdrop-blur-sm bg-black/30 border border-white/10">
-                <h3 className="text-x text-gray-400 font-mono text-center mb-2 uppercase tracking-widest text-shadow">Ninja Keypad</h3>
-                <T9Keyboard activeSignId={detections.length > 0 ? detections[0].classId + 1 : null} />
-                <div className="text-center text-gray-400 text-[20px] font-mono mt-2 text-shadow">
-                  戌=Space | 亥=Next | 酉=Del
-                </div>
+              {/* Status Indicator */}
+              <div className="absolute top-4 left-4 px-2 py-1 bg-black/80 border border-green-500 text-green-500 text-xs font-mono rounded backdrop-blur-sm shadow flex flex-col gap-1">
+                <span>SYS: {isRunning ? 'ACTIVE' : 'STANDBY'}</span>
               </div>
             </div>
 
-            {/* Right Col: Editor Result */}
-            <div className="flex-[1.5] min-w-0 order-1 md:order-2">
-              <T9EditorDisplay
-                {...t9State}
-                onTextChange={(text) => {
-                  t9EngineRef.current.setText(text);
-                  setT9State(t9EngineRef.current.getState());
-                }}
-              />
+            {/* Basic Mode UI: T9 Ninja Input Split Layout */}
+            <div className="flex-1 flex flex-col md:flex-row gap-4 min-h-0 shrink-0">
+              {/* Left Col: T9 Keyboard Reference */}
+              <div className="flex-1 flex flex-col gap-2 min-w-0 justify-center order-2 md:order-1">
+                <div className="rounded-lg p-2 flex-1 flex flex-col justify-center backdrop-blur-sm bg-black/30 border border-white/10">
+                  <h3 className="text-x text-gray-400 font-mono text-center mb-2 uppercase tracking-widest text-shadow">Ninja Keypad</h3>
+                  <T9Keyboard activeSignId={detections.length > 0 ? detections[0].classId + 1 : null} />
+                  <div className="text-center text-gray-400 text-[20px] font-mono mt-2 text-shadow">
+                    戌=Space | 亥=Next | 酉=Del
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Col: Editor Result */}
+              <div className="flex-[1.5] min-w-0 order-1 md:order-2">
+                <T9EditorDisplay
+                  {...t9State}
+                  onTextChange={(text) => {
+                    t9EngineRef.current.setText(text);
+                    setT9State(t9EngineRef.current.getState());
+                  }}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
       </main>
       <Analytics />

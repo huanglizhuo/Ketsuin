@@ -25,6 +25,11 @@ export const HAND_SIGNS: HandSign[] = [
 
 export type JutsuTriggerType = 'auto' | 'mouth_blow' | 'hand_hold';
 
+export interface JutsuSoundEffect {
+  onStart?: string;    // Audio URL for challenge start
+  onComplete?: string; // Audio URL for jutsu activation
+}
+
 export interface Jutsu {
   id: string;
   name: string;
@@ -32,49 +37,135 @@ export interface Jutsu {
   sequence: number[]; // Array of HandSign IDs
   trigger: JutsuTriggerType;
   description?: string;
+  difficulty: number;  // 1-5 stars
+  character?: string;  // Iconic character(s) associated
+  soundEffect?: JutsuSoundEffect; // Hook for future audio
 }
 
-// The main requested Jutsus
+// --- Ninja Rank System ---
+export interface NinjaRank {
+  id: string;
+  title: string;
+  titleJp: string;
+  emoji: string;
+  maxSecondsPerSign: number; // Upper threshold (exclusive), Infinity for lowest
+  description: string;
+}
+
+export const NINJA_RANKS: NinjaRank[] = [
+  { id: 'hokage', title: 'Hokage', titleJp: '火影', emoji: '🏆', maxSecondsPerSign: 0.8, description: '影級の結印速度！' },
+  { id: 'jonin', title: 'Jōnin', titleJp: '上忍', emoji: '🔥', maxSecondsPerSign: 1.2, description: '精英忍者' },
+  { id: 'chunin', title: 'Chūnin', titleJp: '中忍', emoji: '⚡', maxSecondsPerSign: 2.0, description: '合格忍者' },
+  { id: 'genin', title: 'Genin', titleJp: '下忍', emoji: '🌿', maxSecondsPerSign: 3.5, description: '新人忍者' },
+  { id: 'academy', title: 'Academy', titleJp: '学生', emoji: '📕', maxSecondsPerSign: Infinity, description: '忍者学校修行中…' },
+];
+
+export function getRankForTime(timeMs: number, signCount: number): NinjaRank {
+  const secondsPerSign = (timeMs / 1000) / signCount;
+  for (const rank of NINJA_RANKS) {
+    if (secondsPerSign < rank.maxSecondsPerSign) return rank;
+  }
+  return NINJA_RANKS[NINJA_RANKS.length - 1];
+}
+
+// --- Challenge Quotes ---
+export const CHALLENGE_QUOTES: { text: string; character: string }[] = [
+  { text: '結印之速，決定術之強弱。', character: '千手扉間' },
+  { text: '我要成為火影！', character: '漩渦鳴人' },
+  { text: '拋棄同伴的人比垃圾還不如。', character: '旗木卡卡西' },
+  { text: '後輩永遠會超越前輩，這就是忍者。', character: '自來也' },
+  { text: '有光的地方，就會有影。', character: '宇智波斑' },
+  { text: '千鳥…雷切！', character: '旗木卡卡西' },
+  { text: '我的存在不會就這樣消失的！', character: '漩渦鳴人' },
+  { text: '力量就是讓事情發生的能力。', character: '宇智波斑' },
+];
+
+// --- Supported Jutsus (ordered by difficulty) ---
 export const SUPPORTED_JUTSUS: Jutsu[] = [
   {
-    id: 'fireball',
-    name: '火遁·豪火球之术',
-    nameEn: 'Fire Style: Fireball Jutsu',
-    sequence: [6, 8, 9, 12, 7, 3], // 巳－未－申－亥－午－寅
-    trigger: 'mouth_blow',
-    description: 'Blow fire from your mouth after completing the signs.'
+    id: 'shadow_clone',
+    name: '影分身之术',
+    nameEn: 'Shadow Clone Jutsu',
+    sequence: [4, 3, 8], // 卯→寅→未
+    trigger: 'auto',
+    difficulty: 1,
+    character: '漩涡鸣人',
+    description: '鸣人の招牌术！多重影分身！',
   },
   {
     id: 'chidori',
-    name: '雷切',
+    name: '雷切 / 千鸟',
     nameEn: 'Chidori / Raikiri',
-    sequence: [3, 6, 9, 3], // 寅 → 巳 → 申 → 寅 (Simplified Chidori sequence)
-    trigger: 'hand_hold', // Tracks right hand
-    description: 'Focus chakra in your hand to create lightning.'
+    sequence: [3, 6, 9, 3], // 寅→巳→申→寅
+    trigger: 'hand_hold',
+    difficulty: 1,
+    character: '旗木卡卡西 / 宇智波佐助',
+    description: '将查克拉集中于手掌，化为雷电！',
+  },
+  {
+    id: 'reanimation',
+    name: '秽土转生',
+    nameEn: 'Reanimation Jutsu',
+    sequence: [3, 6, 11, 5], // 寅→巳→戌→辰
+    trigger: 'auto',
+    difficulty: 2,
+    character: '大蛇丸',
+    description: '召唤逝去的忍者重返战场的禁术。',
   },
   {
     id: 'summoning',
     name: '通灵之术',
     nameEn: 'Summoning Jutsu',
-    sequence: [12, 11, 10, 9, 8], // 亥 → 戌 → 酉 → 申 → 未
+    sequence: [12, 11, 10, 9, 8], // 亥→戌→酉→申→未
     trigger: 'auto',
-    description: 'Summon a spirit animal.'
-  }
-];
-
-// Legacy list for reference or basic recognition mode
-export const LEGACY_JUTSU_LIST: Omit<Jutsu, 'id' | 'trigger'>[] = [
-  {
-    name: '豪火球术',
-    nameEn: 'Fireball Jutsu',
-    sequence: [6, 3, 9, 12, 7, 3],
+    difficulty: 2,
+    character: '自来也 / 鸣人',
+    description: '咬破拇指，召唤通灵兽！',
   },
   {
-    name: '分身术',
-    nameEn: 'Clone Jutsu',
-    sequence: [8, 6, 3],
+    id: 'rasenshuriken',
+    name: '风遁·螺旋手里剑',
+    nameEn: 'Wind Style: Rasenshuriken',
+    sequence: [1, 4, 9, 2, 5], // 子→卯→申→丑→辰
+    trigger: 'auto',
+    difficulty: 2,
+    character: '漩涡鸣人',
+    description: '风属性查克拉的究极形态！',
   },
-  // ... more can be added back if needed
+  {
+    id: 'fireball',
+    name: '火遁·豪火球之术',
+    nameEn: 'Fire Style: Fireball Jutsu',
+    sequence: [6, 8, 9, 12, 7, 3], // 巳→未→申→亥→午→寅
+    trigger: 'mouth_blow',
+    difficulty: 3,
+    character: '宇智波一族',
+    description: '宇智波一族的入门术，火遁的基础。',
+  },
+  {
+    id: 'tsukuyomi',
+    name: '月読',
+    nameEn: 'Tsukuyomi',
+    sequence: [1, 2, 3, 6, 12, 10, 4, 7, 5, 8, 9, 11], // 子→丑→寅→巳→亥→酉→卯→午→辰→未→申→戌
+    trigger: 'auto',
+    difficulty: 4,
+    character: '宇智波鼬',
+    description: '万花筒写轮眼的究极幻术，将对手困于幻境。',
+  },
+  {
+    id: 'water_dragon',
+    name: '水遁·水龙弹之术',
+    nameEn: 'Water Style: Water Dragon Jutsu',
+    sequence: [
+      2, 9, 4, 1, 12, 10, 2, 7, 10, 6, 3, 11, 1, 8, 6, 2, 5, 4, 1, 9,
+      10, 1, 3, 2, 7, 6, 5, 8, 1, 4, 10, 12, 6, 8, 2, 7, 8, 3, 11, 1,
+      10, 5, 2, 4
+    ], // 44 seals — the legendary sequence
+    trigger: 'auto',
+    difficulty: 5,
+    character: '桃地再不斩 / 旗木卡卡西',
+    description: '传说中的44印！再不斩 vs 卡卡西的经典名场面。',
+  },
 ];
 
 export const WORD_MAPPINGS: Record<string, string> = {

@@ -44,6 +44,8 @@ jobs:
         run: npm run build
         env:
           GITHUB_PAGES: 'true'
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         
       - name: Setup Pages
         uses: actions/configure-pages@v5
