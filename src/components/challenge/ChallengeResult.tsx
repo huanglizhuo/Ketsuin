@@ -75,14 +75,14 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
                        drop-shadow-[0_0_15px_rgba(242,169,0,0.6)]">
                     {result.rank.titleJp}
                 </h2>
-                <p className="text-sm text-gray-400 font-mono mb-4">{result.rank.title}</p>
-                <p className="text-xs text-gray-500 italic">{result.rank.description}</p>
+                <p className="text-sm text-gray-400 font-mono mb-4">{t(`rank.${result.rank.id}` as keyof typeof import('../../i18n/translations').translations.en)}</p>
+                <p className="text-xs text-gray-500 italic">{t(`rank.${result.rank.id}.desc` as keyof typeof import('../../i18n/translations').translations.en)}</p>
 
                 {/* Divider */}
                 <div className="border-t border-white/10 my-4"></div>
 
                 {/* Stats */}
-                <h3 className="text-lg text-konoha-orange font-ninja mb-2">
+                <h3 className="text-lg text-konoha-orange font-ninja-jp mb-2">
                     {result.jutsu.name}
                 </h3>
 

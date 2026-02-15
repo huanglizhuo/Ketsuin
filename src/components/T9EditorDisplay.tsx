@@ -108,7 +108,7 @@ export const T9EditorDisplay: React.FC<T9InputState> = ({
                     const sign = HAND_SIGNS.find(s => s.id === signId);
                     return (
                         <div key={i} className="flex flex-col items-center justify-center min-w-[30px]">
-                            <span className="text-konoha-orange text-xl font-bold font-ninja drop-shadow-[0_0_2px_rgba(242,169,0,0.5)]">
+                            <span className="text-konoha-orange text-xl font-bold font-ninja-jp drop-shadow-[0_0_2px_rgba(242,169,0,0.5)]">
                                 {sign?.kanji || '?'}
                             </span>
                             <span className="text-[8px] text-gray-500 font-mono">

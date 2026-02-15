@@ -55,10 +55,10 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children 
         <div className="flex flex-col gap-4 w-full max-w-4xl mx-auto relative">
             {/* Jutsu Title */}
             <div className="text-center">
-                <h2 className="text-xl md:text-2xl text-konoha-orange font-ninja drop-shadow-[0_0_8px_rgba(242,169,0,0.4)]">
+                <h2 className="text-xl md:text-2xl text-konoha-orange font-ninja-jp drop-shadow-[0_0_8px_rgba(242,169,0,0.4)]">
                     {selectedJutsu.name}
                 </h2>
-                <p className="text-xs text-gray-500 font-mono">{selectedJutsu.nameEn}</p>
+                <p className="text-xs text-gray-500 font-mono">{t(`jutsu.${selectedJutsu.id}.name` as keyof typeof import('../../i18n/translations').translations.en)}</p>
             </div>
 
             {/* Countdown Overlay */}
@@ -91,7 +91,7 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children 
                 <div className="flex items-center justify-center gap-6">
                     {/* Current sign - large */}
                     <div className={`flex flex-col items-center transition-all duration-200 ${lastError ? 'animate-[head-shake_0.5s]' : ''}`}>
-                        <span className={`text-[6rem] md:text-[8rem] font-ninja leading-none select-none
+                        <span className={`text-[6rem] md:text-[8rem] font-ninja-jp leading-none select-none
               ${lastError
                                 ? 'text-red-500 drop-shadow-[0_0_20px_rgba(255,0,0,0.8)]'
                                 : 'text-konoha-orange drop-shadow-[0_0_20px_rgba(242,169,0,0.6)]'
@@ -114,7 +114,7 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children 
                         <>
                             <span className="text-3xl text-gray-600">→</span>
                             <div className="flex flex-col items-center opacity-40">
-                                <span className="text-[3rem] md:text-[4rem] font-ninja text-gray-400 leading-none">
+                                <span className="text-[3rem] md:text-[4rem] font-ninja-jp text-gray-400 leading-none">
                                     {nextSign.kanji}
                                 </span>
                                 <span className="text-xs text-gray-600 font-mono mt-1">
@@ -155,7 +155,7 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children 
                                                 : 'text-gray-600 scale-90 opacity-50'
                                         }`}
                                 >
-                                    <span className="text-lg font-ninja leading-none">
+                                    <span className="text-lg font-ninja-jp leading-none">
                                         {sign?.kanji || '?'}
                                     </span>
                                     <span className="text-[7px] font-mono">

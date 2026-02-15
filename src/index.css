@@ -19,6 +19,7 @@
   --color-scroll-cream: #F5E6BC;
 
   --font-ninja: "AaJianMingShouShu-2", "Courier New", Courier, monospace;
+  --font-ninja-jp: "Reggae One", serif;
   --font-mono: "AaJianMingShouShu-2", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   --animate-pulse-fast: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
