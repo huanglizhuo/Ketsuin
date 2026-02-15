@@ -110,6 +110,16 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                 >
                     🔥 挑戦モード
                 </button>
+                <button
+                    onClick={() => onModeChange('ranking')}
+                    className={`px-4 py-1.5 rounded-t text-xs font-mono uppercase tracking-wider transition-all duration-200
+                        ${appMode === 'ranking'
+                            ? 'bg-konoha-orange/20 text-konoha-orange border border-konoha-orange/40 border-b-0 font-bold'
+                            : 'text-gray-500 hover:text-gray-300 border border-transparent'
+                        }`}
+                >
+                    🏆 排行榜
+                </button>
             </div>
         </header>
     );

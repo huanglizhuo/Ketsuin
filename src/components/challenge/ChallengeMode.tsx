@@ -14,6 +14,8 @@ interface ChallengeModeProps {
     videoRef: React.RefObject<HTMLVideoElement | null>;
     detections: Detection[];
     isRunning: boolean;
+    start: () => void;
+    stop: () => void;
 }
 
 type ChallengeView = 'select' | 'arena' | 'result' | 'leaderboard';
@@ -22,12 +24,16 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
     videoRef,
     detections,
     isRunning,
+    start,
+    stop,
 }) => {
     const engineRef = useRef(new ChallengeEngine());
     const signManagerRef = useRef(new SignManager());
     const [state, setState] = useState<ChallengeState>(engineRef.current.getState());
     const [view, setView] = useState<ChallengeView>('select');
     const [lastResult, setLastResult] = useState<ChallengeResultType | null>(null);
+    // Track whether we auto-started the camera so we know to auto-stop it
+    const autoStartedRef = useRef(false);
 
     // Sync engine state changes
     useEffect(() => {
@@ -39,13 +45,27 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
             if (newState.phase === 'complete' && newState.result) {
                 setLastResult(newState.result);
                 setView('result');
+
+                // Auto-stop camera if we auto-started it
+                if (autoStartedRef.current) {
+                    autoStartedRef.current = false;
+                    stop();
+                }
             }
         });
 
         return () => {
             engineRef.current.destroy();
         };
-    }, []);
+    }, [stop]);
+
+    // Auto-start camera when countdown finishes (phase goes to 'active')
+    useEffect(() => {
+        if (state.phase === 'active' && !isRunning) {
+            autoStartedRef.current = true;
+            start();
+        }
+    }, [state.phase, isRunning, start]);
 
     // Process detections during active challenge
     useEffect(() => {
@@ -83,8 +103,13 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
 
     const handleBackToSelect = useCallback(() => {
         engineRef.current.resetToIdle();
+        // Stop camera if still running from challenge
+        if (autoStartedRef.current) {
+            autoStartedRef.current = false;
+            stop();
+        }
         setView('select');
-    }, []);
+    }, [stop]);
 
     const handleViewLeaderboard = useCallback(() => {
         setView('leaderboard');
@@ -127,14 +152,6 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
                     playerTimeMs={lastResult?.timeMs}
                     onBack={handleLeaderboardBack}
                 />
-            )}
-
-            {/* Camera status warning in challenge */}
-            {view === 'arena' && !isRunning && state.phase === 'active' && (
-                <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-900/90 border border-red-500 px-4 py-2 rounded
-                        text-red-200 text-sm font-mono z-50 animate-pulse">
-                    ⚠ カメラ未起動 — Press "結印 Start" first!
-                </div>
             )}
         </div>
     );

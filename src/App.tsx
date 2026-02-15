@@ -10,8 +10,9 @@ import { SignManager } from './core/SignManager';
 import { T9Engine } from './core/T9Engine';
 import { SignOverlay } from './components/SignOverlay';
 import { ChallengeMode } from './components/challenge/ChallengeMode';
+import { Leaderboard } from './components/challenge/Leaderboard';
 
-export type AppMode = 't9' | 'challenge';
+export type AppMode = 't9' | 'challenge' | 'ranking';
 
 const signManager = new SignManager();
 
@@ -153,7 +154,14 @@ function App() {
             videoRef={videoRef}
             detections={detections}
             isRunning={isRunning}
+            start={start}
+            stop={stop}
           />
+        ) : appMode === 'ranking' ? (
+          /* Standalone Ranking */
+          <div className="flex-1 flex flex-col gap-4 p-4 min-w-0 overflow-y-auto relative">
+            <Leaderboard onBack={() => setAppMode('t9')} />
+          </div>
         ) : (
           /* T9 Mode — Center Content */
           <div className="flex-1 flex flex-col gap-4 p-4 min-w-0 overflow-visible md:overflow-y-auto relative order-1 md:order-2">
