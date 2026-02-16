@@ -11,6 +11,7 @@ import { SignManager } from './core/SignManager';
 import { T9Engine } from './core/T9Engine';
 import { SignOverlay } from './components/SignOverlay';
 import { EasterEggOverlay } from './components/EasterEggOverlay';
+import { HelpOverlay } from './components/HelpOverlay';
 import { ChallengeMode } from './components/challenge/ChallengeMode';
 import { Leaderboard } from './components/challenge/Leaderboard';
 import { ChallengeCard } from './components/challenge/ChallengeCard';
@@ -61,6 +62,22 @@ function App() {
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   const easterEggCooldownRef = useRef<number>(0);
 
+  // Help Overlay State
+  const [showHelp, setShowHelp] = useState(false);
+
+  // Auto-show help on first visit
+  useEffect(() => {
+    const hasSeenTutorial = localStorage.getItem('ketsuin_tutorial_seen');
+    if (!hasSeenTutorial) {
+      setShowHelp(true);
+    }
+  }, []);
+
+  const handleCloseHelp = () => {
+    setShowHelp(false);
+    localStorage.setItem('ketsuin_tutorial_seen', 'true');
+  };
+
   // Unified Processing Effect (T9 mode only)
   useEffect(() => {
     if (appMode !== 't9') return; // Skip T9 processing in challenge mode
@@ -110,8 +127,8 @@ function App() {
         } else {
           const holdDuration = now - deleteHoldStartRef.current;
           // Use a similar threshold to SignManager stability (plus a buffer) or just the same
-          // User requested "similar SIGN_HOLD_MS", so we use the constant
-          if (holdDuration > SignManager.SIGN_HOLD_MS * 3) { // 300ms hold start
+          // Use explicit 300ms threshold (decoupled from SignManager.SIGN_HOLD_MS)
+          if (holdDuration > 300) { // 300ms hold start
             if (now >= nextDeleteTimeRef.current) {
               t9EngineRef.current.handleInput(10); // Trigger Backspace
               setT9State(t9EngineRef.current.getState());
@@ -132,7 +149,7 @@ function App() {
           cycleHoldStartRef.current = now;
         } else {
           const holdDuration = now - cycleHoldStartRef.current;
-          if (holdDuration > SignManager.SIGN_HOLD_MS * 3) { // 300ms hold start
+          if (holdDuration > 300) { // 300ms hold start
             if (now >= nextCycleTimeRef.current) {
               t9EngineRef.current.handleInput(12); // Cycle Candidate
               setT9State(t9EngineRef.current.getState());
@@ -186,6 +203,7 @@ function App() {
         stop={stop}
         appMode={appMode}
         onModeChange={setAppMode}
+        onOpenHelp={() => setShowHelp(true)}
       />
 
       {/* Main Layout */}
@@ -274,6 +292,9 @@ function App() {
 
       <Analytics />
       <SpeedInsights />
+
+      {/* Help Overlay (Root Level) */}
+      <HelpOverlay isOpen={showHelp} onClose={handleCloseHelp} />
     </div>
   );
 }

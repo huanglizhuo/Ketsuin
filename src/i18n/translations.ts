@@ -138,6 +138,24 @@ export const translations = {
         'quote.7.text': 'Power is the ability to make things happen.',
         'quote.7.character': 'Madara Uchiha',
 
+        // Help Overlay
+        'help.title': 'Ninja Academy Guide',
+        'help.tab.t9': 'T9 Input',
+        'help.tab.challenge': 'Challenge',
+        'help.t9.intro': 'Master the Hand Signs',
+        'help.t9.desc': 'Use the numpad or keyboard (1-9) to weave signs. Combine signs to form sentences.',
+        'help.t9.tip': 'Experiment with different combinations to discover hidden words!',
+        'help.challenge.intro': 'Test Your Speed',
+        'help.challenge.desc': 'Select a Jutsu and perform the hand signs as fast as possible.',
+        'help.challenge.step1.title': 'Select Jutsu',
+        'help.challenge.step1.desc': 'Choose a technique from the list.',
+        'help.challenge.step2.title': 'Weave Signs',
+        'help.challenge.step2.desc': 'Follow the sequence shown on screen.',
+        'help.challenge.step3.title': 'Submit Score',
+        'help.challenge.step3.desc': 'Compete on the global leaderboard.',
+        'help.challenge.warning': 'Hand signs must be precise. Lighting matters.',
+        'help.close': 'Understood',
+
         // Share
         'share.title': 'Share Result',
         'share.twitter': 'Share on X',
@@ -269,6 +287,24 @@ export const translations = {
         'quote.6.character': '漩涡鸣人',
         'quote.7.text': '力量就是让事情发生的能力。',
         'quote.7.character': '宇智波斑',
+
+        // Help Overlay
+        'help.title': '忍者学校指南',
+        'help.tab.t9': 'T9 输入',
+        'help.tab.challenge': '挑战模式',
+        'help.t9.intro': '掌握结印',
+        'help.t9.desc': '使用数字键 (1-9) 结印。组合印记输入文字。',
+        'help.t9.tip': '尝试不同的组合来发现隐藏词汇！',
+        'help.challenge.intro': '测试手速',
+        'help.challenge.desc': '选择忍术，以最快速度完成结印。',
+        'help.challenge.step1.title': '选择忍术',
+        'help.challenge.step1.desc': '从列表中选择一个术。',
+        'help.challenge.step2.title': '结印',
+        'help.challenge.step2.desc': '按照屏幕显示的顺序结印。',
+        'help.challenge.step3.title': '提交成绩',
+        'help.challenge.step3.desc': '在全球排行榜上竞争。',
+        'help.challenge.warning': '结印动作需标准，注意光线充足。',
+        'help.close': '明白了',
 
         // Share
         'share.title': '分享成绩',
@@ -402,6 +438,24 @@ export const translations = {
         'quote.7.text': '力とは物事を起こす能力だ。',
         'quote.7.character': 'うちはマダラ',
 
+        // Help Overlay
+        'help.title': '忍者アカデミーガイド',
+        'help.tab.t9': 'T9 入力',
+        'help.tab.challenge': '挑戦モード',
+        'help.t9.intro': '印を極めろ',
+        'help.t9.desc': '数字キー (1-9) で印を結びます。印を組み合わせて文字を入力。',
+        'help.t9.tip': '様々な組み合わせで隠し単語を見つけよう！',
+        'help.challenge.intro': '速度を試せ',
+        'help.challenge.desc': '忍術を選び、最速で印を結べ。',
+        'help.challenge.step1.title': '忍術選択',
+        'help.challenge.step1.desc': 'リストから術を選ぶ。',
+        'help.challenge.step2.title': '結印',
+        'help.challenge.step2.desc': '画面の順序に従って印を結ぶ。',
+        'help.challenge.step3.title': 'スコア送信',
+        'help.challenge.step3.desc': '世界中の忍者と競い合え。',
+        'help.challenge.warning': '印は正確に。照明に注意してください。',
+        'help.close': '了解',
+
         // Share
         'share.title': '結果をシェア',
         'share.twitter': 'Xでシェア',
@@ -533,6 +587,24 @@ export const translations = {
         'quote.6.character': 'Naruto Uzumaki',
         'quote.7.text': 'Le pouvoir est la capacité de faire bouger les choses.',
         'quote.7.character': 'Madara Uchiha',
+
+        // Help Overlay
+        'help.title': 'Guide de l\'Académie Ninja',
+        'help.tab.t9': 'Saisie T9',
+        'help.tab.challenge': 'Défi',
+        'help.t9.intro': 'Maîtrisez les Sceaux',
+        'help.t9.desc': 'Utilisez les touches (1-9) pour les signes. Combinez-les pour écrire.',
+        'help.t9.tip': 'Essayez différentes combinaisons pour découvrir des mots cachés !',
+        'help.challenge.intro': 'Testez votre Vitesse',
+        'help.challenge.desc': 'Choisissez un Jutsu et réalisez les signes le plus vite possible.',
+        'help.challenge.step1.title': 'Choisir Jutsu',
+        'help.challenge.step1.desc': 'Sélectionnez une technique.',
+        'help.challenge.step2.title': 'Signes',
+        'help.challenge.step2.desc': 'Suivez la séquence à l\'écran.',
+        'help.challenge.step3.title': 'Soumettre',
+        'help.challenge.step3.desc': 'Entrez dans le classement mondial.',
+        'help.challenge.warning': 'Les signes doivent être précis. L\'éclairage compte.',
+        'help.close': 'Compris',
 
         // Share
         'share.title': 'Partager le résultat',

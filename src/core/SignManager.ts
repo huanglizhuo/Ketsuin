@@ -14,8 +14,8 @@ export class SignManager {
     private pendingSign: number | null = null;
     private pendingStartTime: number = 0;
     private pendingEmitted: boolean = false;
-    public static readonly SIGN_HOLD_MS = 100;
-    public static readonly SPACE_HOLD_MS = 40;
+    public static readonly SIGN_HOLD_MS = 50;  // > 40ms to avoid misfire
+    public static readonly SPACE_HOLD_MS = 50;
 
     private lastSignTime = 0;
 
