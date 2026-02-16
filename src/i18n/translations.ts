@@ -18,7 +18,7 @@ export const translations = {
         // Header
         'header.loading': 'Gathering Chakra...',
         'header.start': 'Start',
-        'header.stop': 'Release Jutsu',
+        'header.stop': 'Stop',
         'header.tooltip': 'Click to Start!',
         'header.tab.t9': 'T9 Input',
         'header.tab.challenge': '🔥 Challenge',
@@ -157,7 +157,7 @@ export const translations = {
     zh: {
         'header.loading': '聚气中...',
         'header.start': '开始',
-        'header.stop': '释放忍术',
+        'header.stop': '停止',
         'header.tooltip': '点击开始结印！',
         'header.tab.t9': 'T9 输入',
         'header.tab.challenge': '🔥 挑战模式',
@@ -289,7 +289,7 @@ export const translations = {
     ja: {
         'header.loading': 'チャクラ集中中...',
         'header.start': 'スタート',
-        'header.stop': '術解放',
+        'header.stop': '解放',
         'header.tooltip': 'クリックして開始！',
         'header.tab.t9': 'T9 入力',
         'header.tab.challenge': '🔥 挑戦モード',
@@ -421,7 +421,7 @@ export const translations = {
     fr: {
         'header.loading': 'Concentration du chakra...',
         'header.start': 'Démarrer',
-        'header.stop': 'Libérer le jutsu',
+        'header.stop': 'Fini',
         'header.tooltip': 'Cliquez pour commencer !',
         'header.tab.t9': 'Saisie T9',
         'header.tab.challenge': '🔥 Défi',

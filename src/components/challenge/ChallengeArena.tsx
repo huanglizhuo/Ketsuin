@@ -6,9 +6,11 @@ import { useI18n } from '../../i18n/I18nContext';
 interface ChallengeArenaProps {
     state: ChallengeState;
     children?: React.ReactNode; // VideoFeed slot
+    showHandHints: boolean;
+    onToggleHandHints: () => void;
 }
 
-export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children }) => {
+export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children, showHandHints, onToggleHandHints }) => {
     const { selectedJutsu, phase, currentSignIndex, totalSigns, lastError, countdownValue } = state;
     const [displayTime, setDisplayTime] = useState('0.000');
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -86,19 +88,46 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children 
                 </div>
             </div>
 
+            {/* Toggle Hints Button */}
+            <button
+                onClick={onToggleHandHints}
+                className="absolute top-2 right-2 md:top-0 md:right-0 md:translate-x-[120%] p-2 rounded-full
+                           text-white/30 hover:text-konoha-orange hover:bg-white/5 transition-all z-40"
+                title={showHandHints ? "Hide Hand Hints" : "Show Hand Hints"}
+            >
+                {showHandHints ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+                ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" /><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" /><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" /><line x1="2" x2="22" y1="2" y2="22" /></svg>
+                )}
+            </button>
+
             {/* Current Sign Display */}
             {phase === 'active' && currentSign && (
                 <div className="flex items-center justify-center gap-6">
                     {/* Current sign - large */}
                     <div className={`flex flex-col items-center transition-all duration-200 ${lastError ? 'animate-[head-shake_0.5s]' : ''}`}>
-                        <span className={`text-[6rem] md:text-[8rem] font-ninja-jp leading-none select-none
-              ${lastError
-                                ? 'text-red-500 drop-shadow-[0_0_20px_rgba(255,0,0,0.8)]'
-                                : 'text-konoha-orange drop-shadow-[0_0_20px_rgba(242,169,0,0.6)]'
-                            }`}
-                        >
-                            {currentSign.kanji}
-                        </span>
+                        {showHandHints ? (
+                            <div className={`w-32 h-32 md:w-48 md:h-48 relative transition-transform duration-200
+                                ${lastError ? 'scale-110' : 'scale-100'}`}>
+                                <img
+                                    src={`${import.meta.env.BASE_URL}asset/${currentSign.kanji}.png`}
+                                    alt={currentSign.name}
+                                    className={`w-full h-full object-contain filter drop-shadow-[0_0_15px_rgba(242,169,0,0.6)]
+                                        ${lastError ? 'grayscale sepia hue-rotate-[-50deg] brightness-125 drop-shadow-[0_0_20px_rgba(255,0,0,0.8)]' : ''}
+                                    `}
+                                />
+                            </div>
+                        ) : (
+                            <span className={`text-[6rem] md:text-[8rem] font-ninja-jp leading-none select-none
+                  ${lastError
+                                    ? 'text-red-500 drop-shadow-[0_0_20px_rgba(255,0,0,0.8)]'
+                                    : 'text-konoha-orange drop-shadow-[0_0_20px_rgba(242,169,0,0.6)]'
+                                }`}
+                            >
+                                {currentSign.kanji}
+                            </span>
+                        )}
                         <span className="text-sm text-gray-400 font-mono mt-1">
                             {currentSign.name}
                         </span>

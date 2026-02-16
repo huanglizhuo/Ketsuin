@@ -141,6 +141,8 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
         }
     }, [lastResult]);
 
+    const [showHandHints, setShowHandHints] = useState(true);
+
     // --- Render ---
 
     return (
@@ -150,7 +152,11 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
             )}
 
             {view === 'arena' && (
-                <ChallengeArena state={state}>
+                <ChallengeArena
+                    state={state}
+                    showHandHints={showHandHints}
+                    onToggleHandHints={() => setShowHandHints(prev => !prev)}
+                >
                     <VideoFeed videoRef={videoRef} detections={detections} />
                 </ChallengeArena>
             )}

@@ -96,7 +96,7 @@ export const EasterEggOverlay: React.FC<EasterEggOverlayProps> = ({ show }) => {
                 {/* 新年快乐 */}
                 <div
                     style={{
-                        fontFamily: "'Reggae One', cursive, serif",
+                        fontFamily: "'AaJianMingShouShu-2', cursive, serif",
                         fontSize: 'clamp(2.5rem, 9vw, 5.5rem)',
                         color: '#F2A900',
                         textShadow: '0 0 40px rgba(255,120,0,0.8), 0 0 80px rgba(255,60,0,0.4), 0 2px 4px rgba(0,0,0,0.5)',
@@ -112,7 +112,7 @@ export const EasterEggOverlay: React.FC<EasterEggOverlayProps> = ({ show }) => {
                 {/* 码上来福 */}
                 <div
                     style={{
-                        fontFamily: "'Reggae One', cursive, serif",
+                        fontFamily: "'AaJianMingShouShu-2', cursive, serif",
                         fontSize: 'clamp(1.2rem, 4vw, 2.2rem)',
                         color: '#FFD700',
                         textShadow: '0 0 20px rgba(255,215,0,0.6), 0 0 40px rgba(255,160,0,0.3)',
@@ -128,7 +128,7 @@ export const EasterEggOverlay: React.FC<EasterEggOverlayProps> = ({ show }) => {
                 {/* 丙午年 2026 */}
                 <div
                     style={{
-                        fontFamily: "'Courier New', monospace",
+                        fontFamily: "'AaJianMingShouShu-2', monospace",
                         fontSize: 'clamp(0.8rem, 2vw, 1.1rem)',
                         color: 'rgba(255,255,255,0.5)',
                         letterSpacing: '0.3em',
