@@ -6,6 +6,7 @@ import { Leaderboard } from './Leaderboard';
 import { ChallengeEngine } from '../../core/ChallengeEngine';
 import type { ChallengeState, ChallengeResult as ChallengeResultType } from '../../core/ChallengeEngine';
 import type { Jutsu } from '../../config/data';
+import { SUPPORTED_JUTSUS } from '../../config/data';
 import type { Detection } from '../../core/yolox';
 import { SignManager } from '../../core/SignManager';
 import { VideoFeed } from '../VideoFeed';
@@ -16,6 +17,9 @@ interface ChallengeModeProps {
     isRunning: boolean;
     start: () => void;
     stop: () => void;
+    initialJutsuId?: string | null;
+    onInitialJutsuConsumed?: () => void;
+    onSignConfirmed?: (signId: number) => void;
 }
 
 type ChallengeView = 'select' | 'arena' | 'result' | 'leaderboard';
@@ -26,6 +30,9 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
     isRunning,
     start,
     stop,
+    initialJutsuId,
+    onInitialJutsuConsumed,
+    onSignConfirmed,
 }) => {
     const engineRef = useRef(new ChallengeEngine());
     const signManagerRef = useRef(new SignManager());
@@ -67,6 +74,16 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
         }
     }, [state.phase, isRunning, start]);
 
+    // Auto-select jutsu from shared challenge URL
+    useEffect(() => {
+        if (!initialJutsuId) return;
+        const jutsu = SUPPORTED_JUTSUS.find(j => j.id === initialJutsuId);
+        if (jutsu) {
+            handleJutsuSelect(jutsu);
+        }
+        onInitialJutsuConsumed?.();
+    }, [initialJutsuId]);
+
     // Process detections during active challenge
     useEffect(() => {
         if (state.phase !== 'active') return;
@@ -82,6 +99,7 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
             if (event.type === 'SIGN') {
                 const signId = event.data as number;
                 engineRef.current.processSign(signId);
+                onSignConfirmed?.(signId);
             }
         });
     }, [detections, state.phase]);

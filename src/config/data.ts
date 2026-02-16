@@ -82,21 +82,21 @@ export const CHALLENGE_QUOTES: { text: string; character: string }[] = [
 
 // --- Supported Jutsus (ordered by difficulty) ---
 export const SUPPORTED_JUTSUS: Jutsu[] = [
-  {
-    id: 'shadow_clone',
-    name: '影分身之术',
-    nameEn: 'Shadow Clone Jutsu',
-    sequence: [4, 3, 8], // 卯→寅→未
-    trigger: 'auto',
-    difficulty: 1,
-    character: '漩涡鸣人',
-    description: '鸣人の招牌术！多重影分身！',
-  },
+  // {
+  //   id: 'shadow_clone',
+  //   name: '影分身の術',
+  //   nameEn: 'Shadow Clone Jutsu',
+  //   sequence: [4, 3, 8], // 卯→寅→未
+  //   trigger: 'auto',
+  //   difficulty: 1,
+  //   character: '漩涡鸣人',
+  //   description: '鸣人の招牌术！多重影分身！',
+  // },
   {
     id: 'chidori',
-    name: '雷切 / 千鸟',
+    name: '雷切・千鳥',
     nameEn: 'Chidori / Raikiri',
-    sequence: [3, 6, 9, 3], // 寅→巳→申→寅
+    sequence: [2, 4, 9, 2], // 丑->卯->申
     trigger: 'hand_hold',
     difficulty: 1,
     character: '旗木卡卡西 / 宇智波佐助',
@@ -104,7 +104,7 @@ export const SUPPORTED_JUTSUS: Jutsu[] = [
   },
   {
     id: 'reanimation',
-    name: '秽土转生',
+    name: '穢土転生',
     nameEn: 'Reanimation Jutsu',
     sequence: [3, 6, 11, 5], // 寅→巳→戌→辰
     trigger: 'auto',
@@ -114,27 +114,37 @@ export const SUPPORTED_JUTSUS: Jutsu[] = [
   },
   {
     id: 'summoning',
-    name: '通灵之术',
+    name: '口寄せの術',
     nameEn: 'Summoning Jutsu',
     sequence: [12, 11, 10, 9, 8], // 亥→戌→酉→申→未
     trigger: 'auto',
     difficulty: 2,
-    character: '自来也 / 鸣人',
+    character: '自来也 / 漩涡鸣人',
     description: '咬破拇指，召唤通灵兽！',
   },
   {
-    id: 'rasenshuriken',
-    name: '风遁·螺旋手里剑',
-    nameEn: 'Wind Style: Rasenshuriken',
-    sequence: [1, 4, 9, 2, 5], // 子→卯→申→丑→辰
+    id: 'edo_tensei_release',
+    name: '穢土転生・解',
+    nameEn: 'Edo Tensei: Release',
+    sequence: [1, 2, 9, 3, 5, 12], // 子→丑→申→寅→辰→亥
     trigger: 'auto',
     difficulty: 2,
-    character: '漩涡鸣人',
-    description: '风属性查克拉的究极形态！',
+    character: '药师兜',
+    description: '解除秽土转生的通灵契约，将亡者的灵魂送回。',
+  },
+  {
+    id: 'great_waterfall',
+    name: '水遁・大瀑布の術',
+    nameEn: 'Water Style: Great Waterfall Jutsu',
+    sequence: [3, 2, 9, 4, 1, 12, 10, 2, 7], // 寅→丑→申→卯→子→亥→酉→丑→午
+    trigger: 'auto',
+    difficulty: 3,
+    character: '千手扉间 / 桃地再不斩 / 旗木卡卡西',
+    description: '将大量的水卷上高空，像瀑布一样将对手卷入其中。',
   },
   {
     id: 'fireball',
-    name: '火遁·豪火球之术',
+    name: '火遁・豪火球の術',
     nameEn: 'Fire Style: Fireball Jutsu',
     sequence: [6, 8, 9, 12, 7, 3], // 巳→未→申→亥→午→寅
     trigger: 'mouth_blow',
@@ -154,7 +164,7 @@ export const SUPPORTED_JUTSUS: Jutsu[] = [
   },
   {
     id: 'water_dragon',
-    name: '水遁·水龙弹之术',
+    name: '水遁・水龍弾の術',
     nameEn: 'Water Style: Water Dragon Jutsu',
     sequence: [
       2, 9, 4, 1, 12, 10, 2, 7, 10, 6, 3, 11, 1, 8, 6, 2, 5, 4, 1, 9,

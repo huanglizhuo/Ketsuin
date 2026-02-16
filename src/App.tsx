@@ -12,6 +12,9 @@ import { T9Engine } from './core/T9Engine';
 import { SignOverlay } from './components/SignOverlay';
 import { ChallengeMode } from './components/challenge/ChallengeMode';
 import { Leaderboard } from './components/challenge/Leaderboard';
+import { ChallengeCard } from './components/challenge/ChallengeCard';
+import { parseShareParams, clearShareParams } from './core/share';
+import type { ShareParams } from './core/share';
 
 export type AppMode = 't9' | 'challenge' | 'ranking';
 
@@ -23,6 +26,19 @@ function App() {
 
   // App Mode
   const [appMode, setAppMode] = useState<AppMode>('t9');
+
+  // Share challenge state
+  const [challengeFrom, setChallengeFrom] = useState<ShareParams | null>(null);
+  const [initialJutsuId, setInitialJutsuId] = useState<string | null>(null);
+
+  // Parse URL challenge params on mount
+  useEffect(() => {
+    const params = parseShareParams(window.location.search);
+    if (params) {
+      setChallengeFrom(params);
+      clearShareParams();
+    }
+  }, []);
 
   // T9 Engine State
   const t9EngineRef = useRef(new T9Engine());
@@ -158,6 +174,9 @@ function App() {
             isRunning={isRunning}
             start={start}
             stop={stop}
+            initialJutsuId={initialJutsuId}
+            onInitialJutsuConsumed={() => setInitialJutsuId(null)}
+            onSignConfirmed={setLastConfirmedSign}
           />
         ) : appMode === 'ranking' ? (
           /* Standalone Ranking */
@@ -212,6 +231,22 @@ function App() {
         )}
 
       </main>
+      {/* Challenge Card Modal from shared URL */}
+      {challengeFrom && (
+        <ChallengeCard
+          challengerName={challengeFrom.ninjaName}
+          jutsuId={challengeFrom.jutsuId}
+          timeMs={challengeFrom.timeMs}
+          rankId={challengeFrom.rankId}
+          onAccept={() => {
+            setInitialJutsuId(challengeFrom.jutsuId);
+            setAppMode('challenge');
+            setChallengeFrom(null);
+          }}
+          onDismiss={() => setChallengeFrom(null)}
+        />
+      )}
+
       <Analytics />
       <SpeedInsights />
     </div>

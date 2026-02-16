@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { CHALLENGE_QUOTES } from '../../config/data';
+import React, { useState, useRef } from 'react';
 import type { ChallengeResult as ChallengeResultType } from '../../core/ChallengeEngine';
 import { submitScore, fetchPlayerRank } from '../../core/supabase';
+import { buildShareText, buildShareUrl, shareToTwitter, copyToClipboard, isWebShareSupported, shareWithImage, copyImageToClipboard, downloadImage } from '../../core/share';
+import { captureElementAsImage } from './ShareCardRenderer';
 import { useI18n } from '../../i18n/I18nContext';
 
 interface ChallengeResultProps {
@@ -22,10 +23,16 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
     const [submitting, setSubmitting] = useState(false);
     const [playerRank, setPlayerRank] = useState<number | null>(null);
     const [error, setError] = useState('');
-    const { t } = useI18n();
+    const [copied, setCopied] = useState(false);
+    const [imageCopied, setImageCopied] = useState(false);
+    const cardRef = useRef<HTMLDivElement>(null);
+    const { t, locale } = useI18n();
 
-    // Random quote
-    const quote = CHALLENGE_QUOTES[Math.floor(Math.random() * CHALLENGE_QUOTES.length)];
+    // Random quote index (stable per render)
+    const QUOTE_COUNT = 8;
+    const [quoteIndex] = useState(() => Math.floor(Math.random() * QUOTE_COUNT));
+    const quoteText = t(`quote.${quoteIndex}.text` as keyof typeof import('../../i18n/translations').translations.en);
+    const quoteCharacter = t(`quote.${quoteIndex}.character` as keyof typeof import('../../i18n/translations').translations.en);
 
     const handleSubmit = async () => {
         const trimmed = ninjaName.trim();
@@ -58,10 +65,70 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
         }
     };
 
+    // --- Share Handlers ---
+
+    const translatedJutsuName = t(`jutsu.${result.jutsu.id}.name` as keyof typeof import('../../i18n/translations').translations.en);
+
+    const captureCard = async (): Promise<Blob | null> => {
+        if (!cardRef.current) return null;
+        try {
+            return await captureElementAsImage(cardRef.current);
+        } catch {
+            return null;
+        }
+    };
+
+    const handleShareTwitter = async () => {
+        // Capture live card and copy to clipboard, then open tweet compose
+        const blob = await captureCard();
+        if (blob) {
+            try {
+                await copyImageToClipboard(blob);
+                setImageCopied(true);
+                setTimeout(() => setImageCopied(false), 4000);
+            } catch { /* ignore */ }
+        }
+        const text = buildShareText(result, locale, translatedJutsuName, ninjaName || undefined, submitted ? playerRank : null);
+        shareToTwitter(text);
+    };
+
+    const handleShareWeb = async () => {
+        const blob = await captureCard();
+        if (blob) {
+            const text = buildShareText(result, locale, translatedJutsuName, ninjaName || undefined, submitted ? playerRank : null);
+            const ok = await shareWithImage('Ketsuin 結印', text, blob);
+            if (ok) return;
+        }
+        // Fallback: text-only share
+        const text = buildShareText(result, locale, translatedJutsuName, ninjaName || undefined, submitted ? playerRank : null);
+        const url = buildShareUrl(result, ninjaName || undefined);
+        if (navigator.share) {
+            try { await navigator.share({ title: 'Ketsuin 結印', text, url }); } catch { /* cancelled */ }
+        }
+    };
+
+    const handleCopyLink = async () => {
+        const url = buildShareUrl(result, ninjaName || undefined);
+        const ok = await copyToClipboard(url);
+        if (ok) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    const handleSaveImage = async () => {
+        const blob = await captureCard();
+        if (blob) {
+            downloadImage(blob, `ketsuin-${result.jutsu.id}-${result.rank.id}.png`);
+        }
+    };
+
     return (
         <div className="flex flex-col items-center gap-6 w-full max-w-lg mx-auto">
-            {/* Result Card */}
-            <div className="w-full bg-black/50 backdrop-blur-sm border border-konoha-orange/30 rounded-lg p-6 text-center
+            {/* Result Card — captured for screenshot */}
+            <div
+                ref={cardRef}
+                className="w-full bg-black/50 backdrop-blur-sm border border-konoha-orange/30 rounded-lg p-6 text-center
                       shadow-[0_0_30px_rgba(242,169,0,0.1)]">
 
                 {/* Rank Badge */}
@@ -109,8 +176,8 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
 
                 {/* Quote */}
                 <div className="bg-black/30 rounded p-3 mb-4 border border-white/5">
-                    <p className="text-sm text-gray-300 italic">"{quote.text}"</p>
-                    <p className="text-xs text-gray-500 mt-1">— {quote.character}</p>
+                    <p className="text-sm text-gray-300 italic">"{quoteText}"</p>
+                    <p className="text-xs text-gray-500 mt-1">— {quoteCharacter}</p>
                 </div>
 
                 {/* Rank position after submit */}
@@ -184,6 +251,67 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
                 >
                     {t('result.backToSelect')}
                 </button>
+            </div>
+
+            {/* Share Buttons */}
+            <div className="w-full bg-black/30 backdrop-blur-sm border border-white/10 rounded-lg p-3">
+                <p className="text-xs text-gray-500 font-mono text-center mb-2 uppercase tracking-wider">
+                    {t('share.title' as keyof typeof import('../../i18n/translations').translations.en)}
+                </p>
+
+                {/* Image copied toast */}
+                {imageCopied && (
+                    <div className="bg-sky-500/10 border border-sky-500/30 rounded px-3 py-1.5 mb-2 text-center">
+                        <p className="text-sky-400 text-xs font-mono">
+                            {t('share.imageCopied' as keyof typeof import('../../i18n/translations').translations.en)}
+                        </p>
+                    </div>
+                )}
+
+                <div className="flex gap-2 flex-wrap justify-center">
+                    <button
+                        onClick={handleShareTwitter}
+                        className="px-4 py-2 bg-black border border-white/20 text-gray-200 rounded font-mono text-sm
+                         hover:border-sky-400 hover:text-sky-400 transition-all duration-200 flex items-center gap-1.5"
+                    >
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+                        {t('share.twitter' as keyof typeof import('../../i18n/translations').translations.en)}
+                    </button>
+                    {isWebShareSupported() && (
+                        <button
+                            onClick={handleShareWeb}
+                            className="px-4 py-2 bg-black border border-white/20 text-gray-200 rounded font-mono text-sm
+                             hover:border-konoha-orange hover:text-konoha-orange transition-all duration-200 flex items-center gap-1.5"
+                        >
+                            {t('share.more' as keyof typeof import('../../i18n/translations').translations.en)}
+                        </button>
+                    )}
+                    <button
+                        onClick={handleCopyLink}
+                        className={`px-4 py-2 bg-black border rounded font-mono text-sm transition-all duration-200 flex items-center gap-1.5
+                         ${copied
+                                ? 'border-green-500 text-green-400'
+                                : 'border-white/20 text-gray-200 hover:border-white/40 hover:text-white'
+                            }`}
+                    >
+                        {copied
+                            ? `✓ ${t('share.copied' as keyof typeof import('../../i18n/translations').translations.en)}`
+                            : t('share.copy' as keyof typeof import('../../i18n/translations').translations.en)
+                        }
+                    </button>
+                    <button
+                        onClick={handleSaveImage}
+                        className="px-4 py-2 bg-black border border-white/20 text-gray-200 rounded font-mono text-sm
+                         hover:border-konoha-orange hover:text-konoha-orange transition-all duration-200 flex items-center gap-1.5"
+                    >
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        {t('share.saveImage' as keyof typeof import('../../i18n/translations').translations.en)}
+                    </button>
+                </div>
             </div>
         </div>
     );
