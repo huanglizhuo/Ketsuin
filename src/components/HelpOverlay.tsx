@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useI18n } from '../i18n/I18nContext';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface HelpOverlayProps {
     isOpen: boolean;
@@ -21,9 +22,12 @@ export const HelpOverlay: React.FC<HelpOverlayProps> = ({ isOpen, onClose }) => 
                     <h2 className="text-xl md:text-2xl text-konoha-orange font-bold font-ninja tracking-wider">
                         {t('help.title')}
                     </h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors p-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <LanguageSwitcher />
+                        <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors p-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Tabs */}
@@ -79,13 +83,13 @@ export const HelpOverlay: React.FC<HelpOverlayProps> = ({ isOpen, onClose }) => 
                                     <div key={item.id} className="bg-white/5 rounded p-2 flex flex-col items-center border border-white/5 hover:border-konoha-orange/30 transition-colors">
                                         <img src={`${import.meta.env.BASE_URL}asset/${item.sign}.png`} alt={item.sign} className="w-8 h-8 md:w-12 md:h-12 object-contain mb-1" />
                                         <div className="text-xs font-mono text-gray-500">{item.sign}</div>
-                                        <div className="text-xs font-bold text-konoha-orange mt-1">Key {item.key}</div>
+                                        <div className="text-xs font-bold text-konoha-orange mt-1">{t('help.key')} {item.key}</div>
                                     </div>
                                 ))}
                             </div>
 
                             <div className="bg-white/5 rounded p-4 text-sm border-l-2 border-chalice-blue">
-                                <span className="text-konoha-orange font-bold">💡 Tip: </span>
+                                <span className="text-konoha-orange font-bold">{t('help.tip_prefix')}</span>
                                 {t('help.t9.tip')}
                             </div>
                         </div>
@@ -125,7 +129,7 @@ export const HelpOverlay: React.FC<HelpOverlayProps> = ({ isOpen, onClose }) => 
                             </div>
 
                             <div className="bg-akatsuki-red/10 rounded p-4 text-sm border-l-2 border-akatsuki-red text-red-200">
-                                <span className="font-bold">⚠️ Warning: </span>
+                                <span className="font-bold">{t('help.warning_prefix')}</span>
                                 {t('help.challenge.warning')}
                             </div>
                         </div>

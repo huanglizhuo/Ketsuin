@@ -155,6 +155,9 @@ export const translations = {
         'help.challenge.step3.desc': 'Compete on the global leaderboard.',
         'help.challenge.warning': 'Hand signs must be precise. Lighting matters.',
         'help.close': 'Understood',
+        'help.tip_prefix': 'Tip: ',
+        'help.warning_prefix': 'Warning: ',
+        'help.key': 'Key',
 
         // Share
         'share.title': 'Share Result',
@@ -305,6 +308,9 @@ export const translations = {
         'help.challenge.step3.desc': '在全球排行榜上竞争。',
         'help.challenge.warning': '结印动作需标准，注意光线充足。',
         'help.close': '明白了',
+        'help.tip_prefix': '提示：',
+        'help.warning_prefix': '警告：',
+        'help.key': '键',
 
         // Share
         'share.title': '分享成绩',
@@ -455,6 +461,9 @@ export const translations = {
         'help.challenge.step3.desc': '世界中の忍者と競い合え。',
         'help.challenge.warning': '印は正確に。照明に注意してください。',
         'help.close': '了解',
+        'help.tip_prefix': 'ヒント：',
+        'help.warning_prefix': '注意：',
+        'help.key': 'キー',
 
         // Share
         'share.title': '結果をシェア',
@@ -605,6 +614,9 @@ export const translations = {
         'help.challenge.step3.desc': 'Entrez dans le classement mondial.',
         'help.challenge.warning': 'Les signes doivent être précis. L\'éclairage compte.',
         'help.close': 'Compris',
+        'help.tip_prefix': 'Conseil : ',
+        'help.warning_prefix': 'Attention : ',
+        'help.key': 'Touche',
 
         // Share
         'share.title': 'Partager le résultat',
