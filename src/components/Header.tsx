@@ -11,9 +11,10 @@ interface HeaderProps {
     stop: () => void;
     appMode: AppMode;
     onModeChange: (mode: AppMode) => void;
+    onOpenHelp: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start, stop, appMode, onModeChange }) => {
+export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start, stop, appMode, onModeChange, onOpenHelp }) => {
     const [showTooltip, setShowTooltip] = React.useState(false);
     const { t } = useI18n();
 
@@ -79,6 +80,14 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                     {/* Language Switcher */}
                     <LanguageSwitcher />
 
+                    <button
+                        onClick={onOpenHelp}
+                        className="text-gray-400 hover:text-konoha-orange transition-colors p-2 hover:scale-110 active:scale-95 duration-200"
+                        title="Help / Guide"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></svg>
+                    </button>
+
                     <a
                         href="https://github.com/huanglizhuo/Ketsuin"
                         target="_blank"
@@ -126,6 +135,7 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                     {t('header.tab.ranking')}
                 </button>
             </div>
+
         </header>
     );
 };
