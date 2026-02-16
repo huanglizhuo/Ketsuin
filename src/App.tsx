@@ -10,6 +10,7 @@ import { T9Keyboard } from './components/T9Keyboard';
 import { SignManager } from './core/SignManager';
 import { T9Engine } from './core/T9Engine';
 import { SignOverlay } from './components/SignOverlay';
+import { EasterEggOverlay } from './components/EasterEggOverlay';
 import { ChallengeMode } from './components/challenge/ChallengeMode';
 import { Leaderboard } from './components/challenge/Leaderboard';
 import { ChallengeCard } from './components/challenge/ChallengeCard';
@@ -55,6 +56,11 @@ function App() {
   const cycleHoldStartRef = useRef<number | null>(null);
   const nextCycleTimeRef = useRef<number>(0);
 
+  // Easter Egg: 巳(6)→午(7) = 丙午年
+  const prevConfirmedSignRef = useRef<number | null>(null);
+  const [showEasterEgg, setShowEasterEgg] = useState(false);
+  const easterEggCooldownRef = useRef<number>(0);
+
   // Unified Processing Effect (T9 mode only)
   useEffect(() => {
     if (appMode !== 't9') return; // Skip T9 processing in challenge mode
@@ -69,6 +75,22 @@ function App() {
       events.forEach(event => {
         if (event.type === 'SIGN') {
           const newSignId = event.data;
+
+          // Easter Egg check: 巳(6) → 午(7), only during 春节 (Feb 16 – Mar 3, 2026)
+          const now = Date.now();
+          const eggStart = new Date('2026-02-16T00:00:00').getTime();
+          const eggEnd = new Date('2026-03-04T00:00:00').getTime(); // Mar 3 inclusive
+          if (
+            prevConfirmedSignRef.current === 6 &&
+            newSignId === 7 &&
+            now > easterEggCooldownRef.current &&
+            now >= eggStart && now < eggEnd
+          ) {
+            setShowEasterEgg(true);
+            easterEggCooldownRef.current = now + 60_000; // 60s cooldown
+            setTimeout(() => setShowEasterEgg(false), 4500);
+          }
+          prevConfirmedSignRef.current = newSignId;
 
           // Update Overlay
           setLastConfirmedSign(newSignId);
@@ -151,6 +173,9 @@ function App() {
 
       {/* Sekiro-Style Overlay */}
       <SignOverlay currentSign={lastConfirmedSign} />
+
+      {/* Easter Egg: 丙午年 */}
+      <EasterEggOverlay show={showEasterEgg} />
 
       {/* Header */}
       <Header
