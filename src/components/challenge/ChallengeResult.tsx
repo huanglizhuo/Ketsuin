@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import type { ChallengeResult as ChallengeResultType } from '../../core/ChallengeEngine';
 import { submitScore, fetchPlayerRank } from '../../core/supabase';
-import { buildShareText, buildShareUrl, shareToTwitter, copyToClipboard, copyImageToClipboard, downloadImage } from '../../core/share';
+import { buildShareText, buildShareUrl, shareToTwitter, copyToClipboard, copyImageToClipboard } from '../../core/share';
 import { captureElementAsImage } from './ShareCardRenderer';
 import { useI18n } from '../../i18n/I18nContext';
 
@@ -102,12 +102,7 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
         }
     };
 
-    const handleSaveImage = async () => {
-        const blob = await captureCard();
-        if (blob) {
-            downloadImage(blob, `ketsuin-${result.jutsu.id}-${result.rank.id}.png`);
-        }
-    };
+
 
     return (
         <div className="flex flex-col items-center gap-6 w-full max-w-lg mx-auto">
@@ -276,18 +271,7 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
                             : t('share.copy' as keyof typeof import('../../i18n/translations').translations.en)
                         }
                     </button>
-                    <button
-                        onClick={handleSaveImage}
-                        className="px-4 py-2 bg-black border border-white/20 text-gray-200 rounded font-mono text-sm
-                         hover:border-konoha-orange hover:text-konoha-orange transition-all duration-200 flex items-center gap-1.5"
-                    >
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="7 10 12 15 17 10" />
-                            <line x1="12" y1="15" x2="12" y2="3" />
-                        </svg>
-                        {t('share.saveImage' as keyof typeof import('../../i18n/translations').translations.en)}
-                    </button>
+
                 </div>
             </div>
         </div>

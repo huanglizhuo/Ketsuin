@@ -144,7 +144,7 @@ export const translations = {
         'share.copy': 'Copy Link',
         'share.copied': 'Copied!',
         'share.more': 'Share...',
-        'share.saveImage': 'Save Image',
+
         'share.imageCopied': 'Image copied! Paste in your tweet',
         'share.rankAnnounce': '🎉 You ranked #{rank} globally!',
         'share.challengeCard.title': 'Challenge from {name}',
@@ -276,7 +276,7 @@ export const translations = {
         'share.copy': '复制链接',
         'share.copied': '已复制！',
         'share.more': '更多分享...',
-        'share.saveImage': '保存图片',
+
         'share.imageCopied': '图片已复制！粘贴到推文中',
         'share.rankAnnounce': '🎉 全球排名 #{rank}！',
         'share.challengeCard.title': '来自 {name} 的挑战',
@@ -408,7 +408,7 @@ export const translations = {
         'share.copy': 'リンクをコピー',
         'share.copied': 'コピーしました！',
         'share.more': 'その他...',
-        'share.saveImage': '画像を保存',
+
         'share.imageCopied': '画像をコピーしました！ツイートに貼り付けてください',
         'share.rankAnnounce': '🎉 世界ランク #{rank}！',
         'share.challengeCard.title': '{name}からの挑戦',
@@ -540,7 +540,7 @@ export const translations = {
         'share.copy': 'Copier le lien',
         'share.copied': 'Copié !',
         'share.more': 'Partager...',
-        'share.saveImage': 'Sauvegarder l\'image',
+
         'share.imageCopied': 'Image copiée ! Collez dans votre tweet',
         'share.rankAnnounce': '🎉 Rang mondial #{rank} !',
         'share.challengeCard.title': 'Défi de {name}',
