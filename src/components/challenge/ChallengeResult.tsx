@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import type { ChallengeResult as ChallengeResultType } from '../../core/ChallengeEngine';
 import { submitScore, fetchPlayerRank } from '../../core/supabase';
-import { buildShareText, buildShareUrl, shareToTwitter, copyToClipboard, isWebShareSupported, shareWithImage, copyImageToClipboard, downloadImage } from '../../core/share';
+import { buildShareText, buildShareUrl, shareToTwitter, copyToClipboard, copyImageToClipboard, downloadImage } from '../../core/share';
 import { captureElementAsImage } from './ShareCardRenderer';
 import { useI18n } from '../../i18n/I18nContext';
 
@@ -92,20 +92,6 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
         shareToTwitter(text);
     };
 
-    const handleShareWeb = async () => {
-        const blob = await captureCard();
-        if (blob) {
-            const text = buildShareText(result, locale, translatedJutsuName, ninjaName || undefined, submitted ? playerRank : null);
-            const ok = await shareWithImage('Ketsuin 結印', text, blob);
-            if (ok) return;
-        }
-        // Fallback: text-only share
-        const text = buildShareText(result, locale, translatedJutsuName, ninjaName || undefined, submitted ? playerRank : null);
-        const url = buildShareUrl(result, ninjaName || undefined);
-        if (navigator.share) {
-            try { await navigator.share({ title: 'Ketsuin 結印', text, url }); } catch { /* cancelled */ }
-        }
-    };
 
     const handleCopyLink = async () => {
         const url = buildShareUrl(result, ninjaName || undefined);
@@ -277,15 +263,6 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
                         {t('share.twitter' as keyof typeof import('../../i18n/translations').translations.en)}
                     </button>
-                    {isWebShareSupported() && (
-                        <button
-                            onClick={handleShareWeb}
-                            className="px-4 py-2 bg-black border border-white/20 text-gray-200 rounded font-mono text-sm
-                             hover:border-konoha-orange hover:text-konoha-orange transition-all duration-200 flex items-center gap-1.5"
-                        >
-                            {t('share.more' as keyof typeof import('../../i18n/translations').translations.en)}
-                        </button>
-                    )}
                     <button
                         onClick={handleCopyLink}
                         className={`px-4 py-2 bg-black border rounded font-mono text-sm transition-all duration-200 flex items-center gap-1.5
