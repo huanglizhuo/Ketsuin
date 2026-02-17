@@ -491,6 +491,4 @@ export const translations = {
         'share.challengeCard.accept': '挑戦する',
         'share.challengeCard.dismiss': 'また今度',
     },
-
-},
-} as const ;
+} as const;
