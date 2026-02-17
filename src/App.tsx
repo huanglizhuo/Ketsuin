@@ -194,11 +194,6 @@ function App() {
 
       {/* Header */}
       <Header
-        loading={loading}
-        isRunning={isRunning}
-        error={error}
-        start={start}
-        stop={stop}
         onOpenHelp={() => setShowHelp(true)}
       />
 
@@ -210,6 +205,10 @@ function App() {
               videoRef={videoRef}
               detections={detections}
               isRunning={isRunning}
+              loading={loading}
+              error={error}
+              onStart={start}
+              onStop={stop}
               t9State={t9State}
               onTextChange={(text) => {
                 t9EngineRef.current.setText(text);

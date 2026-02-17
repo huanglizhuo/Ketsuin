@@ -14,6 +14,10 @@ interface T9ViewProps {
     onTextChange: (text: string) => void;
     activeSignId: number | null;
     mediaStream?: MediaStream | null;
+    loading: boolean;
+    error: string | null;
+    onStart: () => void;
+    onStop: () => void;
 }
 
 export const T9View: React.FC<T9ViewProps> = ({
@@ -23,7 +27,11 @@ export const T9View: React.FC<T9ViewProps> = ({
     t9State,
     onTextChange,
     activeSignId,
-    mediaStream
+    mediaStream,
+    loading,
+    error,
+    onStart,
+    onStop
 }) => {
     const { t } = useI18n();
 
@@ -34,7 +42,17 @@ export const T9View: React.FC<T9ViewProps> = ({
             <div className="relative w-full max-w-2xl mx-auto z-0 shrink-0">
                 <div className={`relative aspect-video bg-black rounded-lg overflow-hidden border-2 shadow-2xl group transition-colors duration-500 border-gray-700 hover:border-konoha-orange`}>
 
-                    <VideoFeed videoRef={videoRef} detections={detections} srcObject={mediaStream} />
+                    <VideoFeed
+                        videoRef={videoRef}
+                        detections={detections}
+                        srcObject={mediaStream}
+                        isRunning={isRunning}
+                        isLoading={loading}
+                        error={error}
+                        onStart={onStart}
+                        onStop={onStop}
+                        enableControls={true}
+                    />
 
                     {/* Scanline effect */}
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent h-full w-full pointer-events-none animate-scan"></div>

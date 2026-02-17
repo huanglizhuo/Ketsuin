@@ -4,16 +4,10 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface HeaderProps {
-    loading: boolean;
-    isRunning: boolean;
-    error: string | null;
-    start: () => void;
-    stop: () => void;
     onOpenHelp: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start, stop, onOpenHelp }) => {
-    const [showTooltip, setShowTooltip] = React.useState(false);
+export const Header: React.FC<HeaderProps> = ({ onOpenHelp }) => {
     const { t } = useI18n();
     const navigate = useNavigate();
     const location = useLocation();
@@ -29,27 +23,9 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
 
     const activeTab = getActiveTab();
 
-    React.useEffect(() => {
-        const hasStarted = localStorage.getItem('ketsuin_started');
-        if (!hasStarted) {
-            setShowTooltip(true);
-        }
-    }, []);
-
-    const handleStart = () => {
-        localStorage.setItem('ketsuin_started', 'true');
-        setShowTooltip(false);
-        start();
-    };
-
     return (
         <header className="px-6 py-3 bg-transparent flex flex-col z-10 relative">
-            {/* Fullscreen Backdrop for First Time Tooltip */}
-            {showTooltip && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-500 pointer-events-none" />
-            )}
-
-            <div className="flex justify-between items-center relative">
+            <div className="flex flex-col md:flex-row justify-between items-center relative gap-4 md:gap-0">
                 <div className="flex items-center gap-3">
                     <img src={`${import.meta.env.BASE_URL}asset/ketsuin.png`} alt="Ketsuin Logo" className="w-10 h-10 object-contain drop-shadow-md" />
                     <h1 className="text-2xl md:text-3xl text-konoha-orange font-bold tracking-wider text-gray-100 font-ninja drop-shadow-md">
@@ -58,36 +34,6 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <button
-                        onClick={isRunning ? stop : handleStart}
-                        disabled={loading}
-                        className={`
-                        px-6 py-2 bg-gray-800 border-2 rounded font-bold tracking-widest uppercase transition-all duration-300 relative
-                        ${showTooltip ? 'z-50 shadow-[0_0_30px_rgba(242,169,0,0.6)] scale-110' : ''}
-                        ${error
-                                ? 'border-red-500 text-red-500 hover:bg-red-500/10 cursor-pointer shadow-[0_0_15px_#ff0000]'
-                                : loading
-                                    ? 'cursor-wait opacity-50 border-gray-600'
-                                    : isRunning
-                                        ? 'border-akatsuki-red text-akatsuki-red hover:bg-akatsuki-red hover:text-white shadow-[0_0_15px_#980000]'
-                                        : 'border-konoha-orange text-konoha-orange hover:bg-konoha-orange hover:text-black shadow-[0_0_15px_#F2A900]'}
-                    `}
-                    >
-                        {error ? (
-                            <span className="flex items-center gap-2 text-xs md:text-sm whitespace-nowrap">
-                                <span className="text-lg">🚫</span> {error}
-                            </span>
-                        ) : loading ? t('header.loading') : isRunning ? t('header.stop') : t('header.start')}
-
-                        {/* Tooltip for first-time users */}
-                        {showTooltip && !loading && !isRunning && (
-                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 w-40 p-2 bg-konoha-orange text-black font-bold text-xs rounded text-center shadow-[0_0_10px_#F2A900] animate-bounce pointer-events-none z-50">
-                                <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 rotate-45 w-2 h-2 bg-konoha-orange"></div>
-                                {t('header.tooltip')}
-                            </div>
-                        )}
-                    </button>
-
                     {/* Language Switcher */}
                     <LanguageSwitcher />
 
