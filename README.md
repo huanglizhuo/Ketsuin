@@ -76,6 +76,16 @@ npm run dev
 -   **ONNX Runtime Web**: For running the YOLOX object detection model in the browser.
 -   **Tailwind CSS**: For styling and responsive design.
 
+## Release & Optimization
+3.  **Optimize Font**:
+    To ensure fast loading, the app uses a subsetted WOFF2 font containing only used characters.
+    Run this command before releasing to regenerate the font based on current translations:
+
+    ```bash
+    npm run release
+    ```
+    *(Requires `python3`, `fonttools`, and `brotli`)*
+
 ## License
 
 MIT

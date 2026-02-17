@@ -8,7 +8,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "font:update": "bash scripts/update_font.sh",
+    "release": "npm run font:update && npm run build"
   },
   "dependencies": {
     "@mediapipe/camera_utils": "^0.3.1675466862",

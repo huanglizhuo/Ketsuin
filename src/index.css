@@ -2,10 +2,10 @@
 
 @font-face {
   font-family: 'AaJianMingShouShu-2';
-  /* Load from GitHub Pages CDN to save Vercel bandwidth */
-  src: url('https://huanglizhuo.github.io/Ketsuin/fonts/AaJianMingShouShu-2.ttf') format('truetype');
+  src: url('./assets/fonts/AaJianMingShouShu-2.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @theme {
