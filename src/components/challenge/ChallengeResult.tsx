@@ -4,6 +4,7 @@ import { submitScore, fetchPlayerRank } from '../../core/supabase';
 import { buildShareText, buildShareUrl, shareToTwitter, copyToClipboard, copyImageToClipboard } from '../../core/share';
 import { captureElementAsImage } from './ShareCardRenderer';
 import { useI18n } from '../../i18n/I18nContext';
+import { RankInfoModal } from './RankInfoModal';
 
 interface ChallengeResultProps {
     result: ChallengeResultType;
@@ -25,6 +26,8 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
     const [error, setError] = useState('');
     const [copied, setCopied] = useState(false);
     const [imageCopied, setImageCopied] = useState(false);
+    const [showRankInfo, setShowRankInfo] = useState(false);
+
     const cardRef = useRef<HTMLDivElement>(null);
     const { t, locale } = useI18n();
 
@@ -36,7 +39,7 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
 
     const handleSubmit = async () => {
         const trimmed = ninjaName.trim();
-        if (trimmed.length < 1 || trimmed.length > 12) {
+        if (trimmed.length < 1 || trimmed.length > 50) {
             setError(t('result.nameError'));
             return;
         }
@@ -114,17 +117,22 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
 
                 {/* Rank Badge */}
                 <div
-                    className="text-6xl mb-2"
-                    style={{ animation: 'sekiro-flash 1.2s ease-out forwards' }}
+                    onClick={() => setShowRankInfo(true)}
+                    className="cursor-pointer hover:bg-white/5 transition-colors rounded-lg p-2 group"
                 >
-                    {result.rank.emoji}
+                    <div
+                        className="text-6xl mb-2 group-hover:scale-110 transition-transform duration-300"
+                        style={{ animation: 'sekiro-flash 1.2s ease-out forwards' }}
+                    >
+                        {result.rank.emoji}
+                    </div>
+                    <h2 className="text-3xl text-konoha-orange font-ninja mb-1
+                        drop-shadow-[0_0_15px_rgba(242,169,0,0.6)]">
+                        {result.rank.titleJp} <span className="text-xs text-gray-500 align-top opacity-0 group-hover:opacity-100 transition-opacity">ⓘ</span>
+                    </h2>
+                    <p className="text-sm text-gray-400 font-mono mb-4">{t(`rank.${result.rank.id}` as any)}</p>
+                    <p className="text-xs text-gray-500 italic">{t(`rank.${result.rank.id}.desc` as any)}</p>
                 </div>
-                <h2 className="text-3xl text-konoha-orange font-ninja mb-1
-                       drop-shadow-[0_0_15px_rgba(242,169,0,0.6)]">
-                    {result.rank.titleJp}
-                </h2>
-                <p className="text-sm text-gray-400 font-mono mb-4">{t(`rank.${result.rank.id}` as keyof typeof import('../../i18n/translations').translations.en)}</p>
-                <p className="text-xs text-gray-500 italic">{t(`rank.${result.rank.id}.desc` as keyof typeof import('../../i18n/translations').translations.en)}</p>
 
                 {/* Divider */}
                 <div className="border-t border-white/10 my-4"></div>
@@ -182,8 +190,8 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
                             type="text"
                             value={ninjaName}
                             onChange={(e) => setNinjaName(e.target.value)}
-                            maxLength={12}
-                            placeholder="うずまきナルト"
+                            maxLength={50}
+                            placeholder={t('result.namePlaceholder')}
                             className="flex-1 bg-black/50 border border-white/20 rounded px-3 py-2 text-white font-mono
                          focus:border-konoha-orange focus:outline-none focus:ring-1 focus:ring-konoha-orange/50
                          placeholder:text-gray-600"
@@ -274,6 +282,8 @@ export const ChallengeResult: React.FC<ChallengeResultProps> = ({
 
                 </div>
             </div>
+
+            <RankInfoModal isOpen={showRankInfo} onClose={() => setShowRankInfo(false)} />
         </div>
     );
 };

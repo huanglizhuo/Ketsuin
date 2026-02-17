@@ -53,11 +53,11 @@ export interface NinjaRank {
 }
 
 export const NINJA_RANKS: NinjaRank[] = [
-  { id: 'hokage', title: 'Hokage', titleJp: '火影', emoji: '🏆', maxSecondsPerSign: 0.8, description: '影級の結印速度！' },
-  { id: 'jonin', title: 'Jōnin', titleJp: '上忍', emoji: '🔥', maxSecondsPerSign: 1.2, description: '精英忍者' },
-  { id: 'chunin', title: 'Chūnin', titleJp: '中忍', emoji: '⚡', maxSecondsPerSign: 2.0, description: '合格忍者' },
-  { id: 'genin', title: 'Genin', titleJp: '下忍', emoji: '🌿', maxSecondsPerSign: 3.5, description: '新人忍者' },
-  { id: 'academy', title: 'Academy', titleJp: '学生', emoji: '📕', maxSecondsPerSign: Infinity, description: '忍者学校修行中…' },
+  { id: 'six_paths', title: 'Six Paths', titleJp: '六道級', emoji: '🌟', maxSecondsPerSign: 0.6, description: 'Godlike speed!' },
+  { id: 'kage', title: 'Kage', titleJp: '影級', emoji: '🏆', maxSecondsPerSign: 1.0, description: 'Legendary ninja' },
+  { id: 'jonin', title: 'Jōnin', titleJp: '上忍', emoji: '🔥', maxSecondsPerSign: 1.5, description: 'Elite ninja' },
+  { id: 'chunin', title: 'Chūnin', titleJp: '中忍', emoji: '⚡', maxSecondsPerSign: 2.5, description: 'Qualified ninja' },
+  { id: 'genin', title: 'Genin', titleJp: '下忍', emoji: '🌿', maxSecondsPerSign: Infinity, description: 'Rookie ninja' },
 ];
 
 export function getRankForTime(timeMs: number, signCount: number): NinjaRank {

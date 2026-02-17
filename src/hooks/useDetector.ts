@@ -17,6 +17,8 @@ export function useDetector(
     const animationFrameRef = useRef<number>(0);
     const videoRef = useRef<HTMLVideoElement | null>(null);
 
+    const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+
     // loop function remains the same
     const loop = useCallback(async () => {
         if (!videoRef.current || !detectorRef.current || !isRunning) return;
@@ -60,6 +62,7 @@ export function useDetector(
         navigator.mediaDevices.getUserMedia({
             video: { width: { ideal: 640 }, height: { ideal: 480 } }
         }).then(stream => {
+            setMediaStream(stream); // Save stream
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
                 videoRef.current.play();
@@ -88,6 +91,7 @@ export function useDetector(
             stream.getTracks().forEach(t => t.stop());
             videoRef.current.srcObject = null;
         }
+        setMediaStream(null);
     }, []);
 
     useEffect(() => {
@@ -98,5 +102,5 @@ export function useDetector(
         }
     }, [isRunning, loop]);
 
-    return { loading, isRunning, start, stop, detections, videoRef, error };
+    return { loading, isRunning, start, stop, detections, videoRef, error, mediaStream };
 }

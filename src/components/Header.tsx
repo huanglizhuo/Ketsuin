@@ -1,7 +1,7 @@
 import React from 'react';
-import type { AppMode } from '../App';
 import { useI18n } from '../i18n/I18nContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface HeaderProps {
     loading: boolean;
@@ -9,14 +9,25 @@ interface HeaderProps {
     error: string | null;
     start: () => void;
     stop: () => void;
-    appMode: AppMode;
-    onModeChange: (mode: AppMode) => void;
     onOpenHelp: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start, stop, appMode, onModeChange, onOpenHelp }) => {
+export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start, stop, onOpenHelp }) => {
     const [showTooltip, setShowTooltip] = React.useState(false);
     const { t } = useI18n();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const currentPath = location.pathname;
+
+    // Helper to determine active tab
+    const getActiveTab = () => {
+        if (currentPath === '/challenge') return 'challenge';
+        if (currentPath === '/ranking') return 'ranking';
+        return 't9';
+    };
+
+    const activeTab = getActiveTab();
 
     React.useEffect(() => {
         const hasStarted = localStorage.getItem('ketsuin_started');
@@ -105,9 +116,9 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
             {/* Mode Tabs */}
             <div className="flex gap-1 mt-2 relative z-50">
                 <button
-                    onClick={() => onModeChange('t9')}
+                    onClick={() => navigate('/')}
                     className={`px-4 py-1.5 rounded-t text-xs font-mono uppercase tracking-wider transition-all duration-200
-                        ${appMode === 't9'
+                        ${activeTab === 't9'
                             ? 'bg-konoha-orange/20 text-konoha-orange border border-konoha-orange/40 border-b-0 font-bold'
                             : 'text-gray-500 hover:text-gray-300 border border-transparent'
                         }`}
@@ -115,9 +126,9 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                     {t('header.tab.t9')}
                 </button>
                 <button
-                    onClick={() => onModeChange('challenge')}
+                    onClick={() => navigate('/challenge')}
                     className={`px-4 py-1.5 rounded-t text-xs font-mono uppercase tracking-wider transition-all duration-200
-                        ${appMode === 'challenge'
+                        ${activeTab === 'challenge'
                             ? 'bg-konoha-orange/20 text-konoha-orange border border-konoha-orange/40 border-b-0 font-bold'
                             : 'text-gray-500 hover:text-gray-300 border border-transparent'
                         }`}
@@ -125,9 +136,9 @@ export const Header: React.FC<HeaderProps> = ({ loading, isRunning, error, start
                     {t('header.tab.challenge')}
                 </button>
                 <button
-                    onClick={() => onModeChange('ranking')}
+                    onClick={() => navigate('/ranking')}
                     className={`px-4 py-1.5 rounded-t text-xs font-mono uppercase tracking-wider transition-all duration-200
-                        ${appMode === 'ranking'
+                        ${activeTab === 'ranking'
                             ? 'bg-konoha-orange/20 text-konoha-orange border border-konoha-orange/40 border-b-0 font-bold'
                             : 'text-gray-500 hover:text-gray-300 border border-transparent'
                         }`}

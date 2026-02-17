@@ -5,10 +5,20 @@ import { HAND_SIGNS } from '../config/data';
 interface VideoFeedProps {
     videoRef: React.RefObject<HTMLVideoElement | null>;
     detections: Detection[];
+    srcObject?: MediaStream | null; // Optional to support existing usage for now
 }
 
-export const VideoFeed: React.FC<VideoFeedProps> = ({ videoRef, detections }) => {
+export const VideoFeed: React.FC<VideoFeedProps> = ({ videoRef, detections, srcObject }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    // Re-attach stream when component remounts or stream changes
+    useEffect(() => {
+        if (videoRef.current && srcObject) {
+            videoRef.current.srcObject = srcObject;
+            // Need to ensure it plays if it was playing, or just call play()
+            videoRef.current.play().catch(e => console.log('Video play error:', e));
+        }
+    }, [videoRef, srcObject]);
 
     useEffect(() => {
         const canvas = canvasRef.current;

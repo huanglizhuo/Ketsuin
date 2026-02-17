@@ -4,11 +4,12 @@ import type { NinjaRank } from '../../config/data';
 import { fetchLeaderboard, isSupabaseConfigured } from '../../core/supabase';
 import type { LeaderboardEntry } from '../../core/supabase';
 import { useI18n } from '../../i18n/I18nContext';
+import { useNavigate } from 'react-router-dom';
 
 interface LeaderboardProps {
     initialJutsuId?: string;
     playerTimeMs?: number; // Highlight player's approximate position
-    onBack: () => void;
+    onBack?: () => void; // Optional: fallback if not provided
 }
 
 function getRankBadge(rankId: string): NinjaRank | undefined {
@@ -20,11 +21,12 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
     playerTimeMs,
     onBack,
 }) => {
-    const [selectedJutsuId, setSelectedJutsuId] = useState(initialJutsuId || SUPPORTED_JUTSUS[0].id);
+    const { t } = useI18n();
+    const navigate = useNavigate();
+    const [selectedJutsuId, setSelectedJutsuId] = useState<string>(initialJutsuId || SUPPORTED_JUTSUS[0].id);
     const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const { t } = useI18n();
 
     useEffect(() => {
         loadLeaderboard(selectedJutsuId);
@@ -53,7 +55,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                     {t('leaderboard.title')}
                 </h2>
                 <button
-                    onClick={onBack}
+                    onClick={() => onBack ? onBack() : navigate('/')}
                     className="text-sm text-gray-400 hover:text-white font-mono transition-colors"
                 >
                     {t('leaderboard.back')}
@@ -75,7 +77,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
               ${jutsu.id === selectedJutsuId
                                 ? 'bg-konoha-orange text-black font-bold'
                                 : 'bg-black/30 text-gray-400 hover:text-white border border-white/10'
-                            }`}
+                            } `}
                     >
                         {jutsu.name}
                     </button>
@@ -126,11 +128,11 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                                             : i < 3
                                                 ? 'bg-white/[0.02]'
                                                 : ''
-                                        }`}
+                                        } `}
                                 >
                                     {/* Rank Number */}
                                     <span className={`font-mono font-bold text-sm
-                    ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-gray-300' : i === 2 ? 'text-amber-600' : 'text-gray-500'}`}
+                    ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-gray-300' : i === 2 ? 'text-amber-600' : 'text-gray-500'} `}
                                     >
                                         #{i + 1}
                                     </span>
@@ -152,7 +154,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
 
                                     {/* Rank Badge */}
                                     <span className="text-xs text-right">
-                                        {rank ? `${rank.emoji} ${rank.titleJp}` : entry.rank_title}
+                                        {rank ? `${rank.emoji} ${rank.titleJp} ` : entry.rank_title}
                                     </span>
                                 </div>
                             );

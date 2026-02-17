@@ -20,6 +20,7 @@ interface ChallengeModeProps {
     initialJutsuId?: string | null;
     onInitialJutsuConsumed?: () => void;
     onSignConfirmed?: (signId: number) => void;
+    mediaStream?: MediaStream | null;
 }
 
 type ChallengeView = 'select' | 'arena' | 'result' | 'leaderboard';
@@ -33,6 +34,7 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
     initialJutsuId,
     onInitialJutsuConsumed,
     onSignConfirmed,
+    mediaStream
 }) => {
     const engineRef = useRef(new ChallengeEngine());
     const signManagerRef = useRef(new SignManager());
@@ -157,7 +159,7 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
                     showHandHints={showHandHints}
                     onToggleHandHints={() => setShowHandHints(prev => !prev)}
                 >
-                    <VideoFeed videoRef={videoRef} detections={detections} />
+                    <VideoFeed videoRef={videoRef} detections={detections} srcObject={mediaStream} />
                 </ChallengeArena>
             )}
 
