@@ -57,14 +57,12 @@ const SHARE_TEMPLATES: Record<Locale, string> = {
     en: 'I weaved {jutsu} in {time}s and achieved {rank}! Can you beat me?\n{url}\n#Ketsuin #Naruto #NinjaHandSigns',
     zh: '我用{time}秒完成了{jutsu}的结印！达到了{rank}！你能超越我吗？\n{url}\n#Ketsuin #火影忍者 #結印',
     ja: '{jutsu}を{time}秒で結印！{rank}達成！挑戦してみろ！\n{url}\n#Ketsuin #NARUTO #結印',
-    fr: 'J\'ai exécuté {jutsu} en {time}s — {rank} ! Tu peux faire mieux ?\n{url}\n#Ketsuin #Naruto',
 };
 
 const SHARE_TEMPLATES_RANKED: Record<Locale, string> = {
     en: 'I weaved {jutsu} in {time}s and achieved {rank}! Global #{rankNum}\nCan you beat me?\n{url}\n#Ketsuin #Naruto #NinjaHandSigns',
     zh: '我用{time}秒完成了{jutsu}的结印！{rank}！全球排名 #{rankNum}\n你能超越我吗？\n{url}\n#Ketsuin #火影忍者 #結印',
     ja: '{jutsu}を{time}秒で結印！{rank}！世界ランク #{rankNum}\n挑戦してみろ！\n{url}\n#Ketsuin #NARUTO #結印',
-    fr: 'J\'ai exécuté {jutsu} en {time}s — {rank} ! Rang mondial #{rankNum}\nTu peux faire mieux ?\n{url}\n#Ketsuin #Naruto',
 };
 
 /**
