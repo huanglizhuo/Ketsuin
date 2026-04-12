@@ -122,10 +122,6 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
     }, [engine, log, stop]);
 
     useEffect(() => {
-        log('Challenge route mounted', { isRunning });
-    }, [isRunning, log]);
-
-    useEffect(() => {
         if (didResetCameraOnEntryRef.current) return;
         didResetCameraOnEntryRef.current = true;
 

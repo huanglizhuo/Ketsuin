@@ -9,6 +9,7 @@ export function useDetector(
     // Default to GitHub Pages CDN to save Vercel bandwidth
     modelPath: string = 'https://huanglizhuo.github.io/Ketsuin/model/yolox_nano.onnx'
 ) {
+    const DETECTION_INTERVAL_MS = 100;
     const [loading, setLoading] = useState(false); // Not loading initially
     const [isRunning, setIsRunning] = useState(false);
     const [detections, setDetections] = useState<Detection[]>([]);
@@ -18,6 +19,8 @@ export function useDetector(
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const waitingForVideoRefRef = useRef(false);
     const mediaStreamRef = useRef<MediaStream | null>(null);
+    const lastDetectionAtRef = useRef(0);
+    const detectInFlightRef = useRef(false);
 
     const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
 
@@ -49,13 +52,23 @@ export function useDetector(
             log('Video element mounted, detection loop resumed');
         }
 
-        // Only detect if video has data
-        if (videoRef.current.readyState === 4) {
+        const now = performance.now();
+
+        // Only detect if video has data, one inference at a time, and at a capped rate.
+        if (
+            videoRef.current.readyState === 4 &&
+            !detectInFlightRef.current &&
+            now - lastDetectionAtRef.current >= DETECTION_INTERVAL_MS
+        ) {
             try {
+                detectInFlightRef.current = true;
                 const dets = await detectorRef.current.detect(videoRef.current);
+                lastDetectionAtRef.current = performance.now();
                 setDetections(dets);
             } catch (e) {
                 console.error("Detection error", e);
+            } finally {
+                detectInFlightRef.current = false;
             }
         }
 
@@ -136,6 +149,8 @@ export function useDetector(
         setIsRunning(false);
         if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
         waitingForVideoRefRef.current = false;
+        detectInFlightRef.current = false;
+        lastDetectionAtRef.current = 0;
 
         const streamsToStop = new Set<MediaStream>();
         if (mediaStreamRef.current) {

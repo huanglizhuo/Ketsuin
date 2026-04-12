@@ -5,9 +5,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 interface HeaderProps {
     onOpenHelp: () => void;
+    onBeforeNavigate?: (path: '/' | '/challenge' | '/ranking') => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenHelp }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenHelp, onBeforeNavigate }) => {
     const { t } = useI18n();
     const navigate = useNavigate();
     const location = useLocation();
@@ -23,8 +24,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHelp }) => {
 
     const activeTab = getActiveTab();
 
+    const handleNavigate = (path: '/' | '/challenge' | '/ranking') => {
+        onBeforeNavigate?.(path);
+        navigate(path);
+    };
+
     return (
-        <header className="px-6 py-3 bg-transparent flex flex-col z-10 relative">
+        <header className="px-6 py-3 bg-transparent flex flex-col shrink-0 sticky top-0 z-[120] relative">
             <div className="flex flex-col md:flex-row justify-between items-center relative gap-4 md:gap-0">
                 <div className="flex items-center gap-3">
                     <img src={`${import.meta.env.BASE_URL}asset/ketsuin.png`} alt="Ketsuin Logo" className="w-10 h-10 object-contain drop-shadow-md" />
@@ -62,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHelp }) => {
             {/* Mode Tabs */}
             <div className="flex gap-1 mt-2 relative z-50">
                 <button
-                    onClick={() => navigate('/')}
+                    onClick={() => handleNavigate('/')}
                     className={`px-4 py-1.5 rounded-t text-xs font-mono uppercase tracking-wider transition-all duration-200
                         ${activeTab === 't9'
                             ? 'bg-konoha-orange/20 text-konoha-orange border border-konoha-orange/40 border-b-0 font-bold'
@@ -72,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHelp }) => {
                     {t('header.tab.t9')}
                 </button>
                 <button
-                    onClick={() => navigate('/challenge')}
+                    onClick={() => handleNavigate('/challenge')}
                     className={`px-4 py-1.5 rounded-t text-xs font-mono uppercase tracking-wider transition-all duration-200
                         ${activeTab === 'challenge'
                             ? 'bg-konoha-orange/20 text-konoha-orange border border-konoha-orange/40 border-b-0 font-bold'
@@ -82,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHelp }) => {
                     {t('header.tab.challenge')}
                 </button>
                 <button
-                    onClick={() => navigate('/ranking')}
+                    onClick={() => handleNavigate('/ranking')}
                     className={`px-4 py-1.5 rounded-t text-xs font-mono uppercase tracking-wider transition-all duration-200
                         ${activeTab === 'ranking'
                             ? 'bg-konoha-orange/20 text-konoha-orange border border-konoha-orange/40 border-b-0 font-bold'

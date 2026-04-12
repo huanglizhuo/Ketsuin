@@ -93,7 +93,8 @@ export const VideoFeed: React.FC<VideoFeedProps> = ({
         left: 0,
         width: '100%',
         height: '100%',
-        objectFit: 'contain'
+        objectFit: 'contain',
+        pointerEvents: 'none'
     };
 
     return (

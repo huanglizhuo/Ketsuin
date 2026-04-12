@@ -195,10 +195,15 @@ function App() {
       {/* Header */}
       <Header
         onOpenHelp={() => setShowHelp(true)}
+        onBeforeNavigate={(path) => {
+          if (path !== location.pathname && isRunning) {
+            stop();
+          }
+        }}
       />
 
       {/* Main Layout */}
-      <main className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden relative z-10">
+      <main className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden relative z-0">
         <Routes>
           <Route path="/" element={
             <T9View
