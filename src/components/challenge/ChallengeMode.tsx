@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { JutsuSelect } from './JutsuSelect';
 import { ChallengeArena } from './ChallengeArena';
 import { ChallengeResult } from './ChallengeResult';
@@ -36,100 +36,53 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
     onSignConfirmed,
     mediaStream
 }) => {
-    const engineRef = useRef(new ChallengeEngine());
-    const signManagerRef = useRef(new SignManager());
-    const [state, setState] = useState<ChallengeState>(engineRef.current.getState());
+    const [engine] = useState(() => new ChallengeEngine());
+    const [signManager] = useState(() => new SignManager());
+    const [state, setState] = useState<ChallengeState>(() => engine.getState());
     const [view, setView] = useState<ChallengeView>('select');
     const [lastResult, setLastResult] = useState<ChallengeResultType | null>(null);
     // Track whether we auto-started the camera so we know to auto-stop it
     const autoStartedRef = useRef(false);
+    const didResetCameraOnEntryRef = useRef(false);
 
-    // Sync engine state changes
-    useEffect(() => {
-        engineRef.current.setOnStateChange(() => {
-            const newState = engineRef.current.getState();
-            setState(newState);
-
-            // Auto-transition to result view on complete
-            if (newState.phase === 'complete' && newState.result) {
-                setLastResult(newState.result);
-                setView('result');
-
-                // Auto-stop camera if we auto-started it
-                if (autoStartedRef.current) {
-                    autoStartedRef.current = false;
-                    stop();
-                }
-            }
-        });
-
-        return () => {
-            engineRef.current.destroy();
-        };
-    }, [stop]);
-
-    // Auto-start camera when countdown begins (so model warms up before timer starts)
-    useEffect(() => {
-        if (state.phase === 'countdown' && !isRunning) {
-            autoStartedRef.current = true;
-            start();
-        }
-    }, [state.phase, isRunning, start]);
-
-    // Auto-select jutsu from shared challenge URL
-    useEffect(() => {
-        if (!initialJutsuId) return;
-        const jutsu = SUPPORTED_JUTSUS.find(j => j.id === initialJutsuId);
-        if (jutsu) {
-            handleJutsuSelect(jutsu);
-        }
-        onInitialJutsuConsumed?.();
-    }, [initialJutsuId]);
-
-    // Process detections during active challenge
-    useEffect(() => {
-        if (state.phase !== 'active') return;
-        if (detections.length === 0) {
-            signManagerRef.current.resetStability();
+    const log = useCallback((message: string, details?: Record<string, unknown>) => {
+        if (details) {
+            console.log('[ChallengeMode]', message, details);
             return;
         }
-
-        const best = detections[0];
-        const events = signManagerRef.current.process(best.classId);
-
-        events.forEach(event => {
-            if (event.type === 'SIGN') {
-                const signId = event.data as number;
-                engineRef.current.processSign(signId);
-                onSignConfirmed?.(signId);
-            }
-        });
-    }, [detections, state.phase]);
+        console.log('[ChallengeMode]', message);
+    }, []);
 
     // --- Handlers ---
 
     const handleJutsuSelect = useCallback((jutsu: Jutsu) => {
-        engineRef.current.selectJutsu(jutsu);
-        engineRef.current.startCountdown();
-        signManagerRef.current.clearHistory();
+        log('Jutsu selected', { jutsuId: jutsu.id, isRunning });
+        engine.selectJutsu(jutsu);
         setView('arena');
-    }, []);
+        signManager.clearHistory();
+        engine.startCountdown();
+    }, [engine, isRunning, log, signManager]);
 
     const handleRetry = useCallback(() => {
-        signManagerRef.current.clearHistory();
-        engineRef.current.retryCurrentJutsu();
+        log('Retrying current challenge');
+        signManager.clearHistory();
         setView('arena');
-    }, []);
+        engine.retryCurrentJutsu();
+    }, [engine, log, signManager]);
 
     const handleBackToSelect = useCallback(() => {
-        engineRef.current.resetToIdle();
+        log('Returning from challenge to jutsu select', {
+            autoStarted: autoStartedRef.current,
+            isRunning,
+        });
+        engine.resetToIdle();
         // Stop camera if still running from challenge
         if (autoStartedRef.current) {
             autoStartedRef.current = false;
             stop();
         }
         setView('select');
-    }, [stop]);
+    }, [engine, isRunning, log, stop]);
 
     const handleViewLeaderboard = useCallback(() => {
         setView('leaderboard');
@@ -142,6 +95,89 @@ export const ChallengeMode: React.FC<ChallengeModeProps> = ({
             setView('select');
         }
     }, [lastResult]);
+
+    // Sync engine state changes
+    useEffect(() => {
+        engine.setOnStateChange(() => {
+            const newState = engine.getState();
+            setState(newState);
+
+            // Auto-transition to result view on complete
+            if (newState.phase === 'complete' && newState.result) {
+                setLastResult(newState.result);
+                setView('result');
+
+                // Auto-stop camera if we auto-started it
+                if (autoStartedRef.current) {
+                    log('Challenge completed, auto-stopping challenge camera');
+                    autoStartedRef.current = false;
+                    stop();
+                }
+            }
+        });
+
+        return () => {
+            engine.destroy();
+        };
+    }, [engine, log, stop]);
+
+    useEffect(() => {
+        log('Challenge route mounted', { isRunning });
+    }, [isRunning, log]);
+
+    useEffect(() => {
+        if (didResetCameraOnEntryRef.current) return;
+        didResetCameraOnEntryRef.current = true;
+
+        if (isRunning) {
+            log('Stopping inherited T9 camera before challenge flow begins');
+            autoStartedRef.current = false;
+            stop();
+        } else {
+            log('Challenge entered with camera already stopped');
+        }
+    }, [isRunning, log, stop]);
+
+    // Auto-start camera when countdown begins (so model warms up before timer starts)
+    useEffect(() => {
+        if (view === 'arena' && state.phase === 'countdown' && !isRunning) {
+            log('Countdown started, auto-starting challenge camera');
+            autoStartedRef.current = true;
+            start();
+        }
+    }, [isRunning, log, start, state.phase, view]);
+
+    // Auto-select jutsu from shared challenge URL
+    useEffect(() => {
+        if (!initialJutsuId) return;
+        const jutsu = SUPPORTED_JUTSUS.find(j => j.id === initialJutsuId);
+        if (jutsu) {
+            queueMicrotask(() => {
+                handleJutsuSelect(jutsu);
+            });
+        }
+        onInitialJutsuConsumed?.();
+    }, [handleJutsuSelect, initialJutsuId, onInitialJutsuConsumed]);
+
+    // Process detections during active challenge
+    useEffect(() => {
+        if (state.phase !== 'active') return;
+        if (detections.length === 0) {
+            signManager.resetStability();
+            return;
+        }
+
+        const best = detections[0];
+        const events = signManager.process(best.classId);
+
+        events.forEach(event => {
+            if (event.type === 'SIGN') {
+                const signId = event.data as number;
+                engine.processSign(signId);
+                onSignConfirmed?.(signId);
+            }
+        });
+    }, [detections, engine, onSignConfirmed, signManager, state.phase]);
 
     const [showHandHints, setShowHandHints] = useState(true);
 
