@@ -1,4 +1,4 @@
-import React from 'react';
+import { memo } from 'react';
 import { useI18n } from '../i18n/I18nContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -8,7 +8,7 @@ interface HeaderProps {
     onBeforeNavigate?: (path: '/' | '/challenge' | '/ranking') => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenHelp, onBeforeNavigate }) => {
+export const Header = memo(function Header({ onOpenHelp, onBeforeNavigate }: HeaderProps) {
     const { t } = useI18n();
     const navigate = useNavigate();
     const location = useLocation();
@@ -101,4 +101,4 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHelp, onBeforeNavigate }) 
 
         </header>
     );
-};
+});

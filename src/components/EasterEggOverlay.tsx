@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 interface EasterEggOverlayProps {
     show: boolean;
 }
 
-export const EasterEggOverlay: React.FC<EasterEggOverlayProps> = ({ show }) => {
+export const EasterEggOverlay = memo(function EasterEggOverlay({ show }: EasterEggOverlayProps) {
     const [animate, setAnimate] = useState(false);
 
     useEffect(() => {
@@ -115,4 +115,4 @@ export const EasterEggOverlay: React.FC<EasterEggOverlayProps> = ({ show }) => {
             `}</style>
         </div>
     );
-};
+});

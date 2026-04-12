@@ -1,12 +1,12 @@
 
-import React, { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { HAND_SIGNS } from '../config/data';
 
 interface SignOverlayProps {
     currentSign: number | null; // 1-based Sign ID
 }
 
-export const SignOverlay: React.FC<SignOverlayProps> = ({ currentSign }) => {
+export const SignOverlay = memo(function SignOverlay({ currentSign }: SignOverlayProps) {
     const [animate, setAnimate] = useState(false);
     const [displaySign, setDisplaySign] = useState<number | null>(null);
 
@@ -91,4 +91,4 @@ export const SignOverlay: React.FC<SignOverlayProps> = ({ currentSign }) => {
             `}</style>
         </div>
     );
-};
+});
