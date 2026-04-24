@@ -46,10 +46,8 @@ export const VideoFeed: React.FC<VideoFeedProps> = ({
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Clear
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Ensure canvas matches video size if video is playing
         if (video.videoWidth) {
             if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
                 canvas.width = video.videoWidth;
@@ -57,22 +55,24 @@ export const VideoFeed: React.FC<VideoFeedProps> = ({
             }
         }
 
-        // Draw detections
+        const konohaOrange = getComputedStyle(document.documentElement)
+            .getPropertyValue('--color-konoha-orange').trim() || '#F2A900';
+
         detections.forEach(det => {
             const [x1, y1, x2, y2] = det.box;
             const w = x2 - x1;
             const h = y2 - y1;
 
-            ctx.strokeStyle = '#F2A900';
-            ctx.shadowColor = '#F2A900';
+            ctx.strokeStyle = konohaOrange;
+            ctx.shadowColor = konohaOrange;
             ctx.shadowBlur = 10;
             ctx.lineWidth = 2;
             ctx.strokeRect(x1, y1, w, h);
 
-            const sign = HAND_SIGNS.find(s => s.id === det.classId + 1); // Mapping 0 -> 1 based on previous logic
+            const sign = HAND_SIGNS.find(s => s.id === det.classId + 1);
             const label = sign ? `${sign.kanji} ${sign.name} (${det.score.toFixed(2)})` : `Unknown ${det.classId}`;
 
-            ctx.fillStyle = '#F2A900'; // text bg
+            ctx.fillStyle = konohaOrange;
             ctx.font = '16px "AaJianMingShouShu-2"';
             ctx.fillText(label, x1, y1 - 5);
         });
@@ -139,7 +139,7 @@ export const VideoFeed: React.FC<VideoFeedProps> = ({
                     {!isRunning && !isLoading && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/20 transition-colors z-10 cursor-pointer" onClick={onStart}>
                             <button
-                                className="px-8 py-3 bg-konoha-orange/90 hover:bg-konoha-orange text-black font-bold font-ninja text-xl tracking-[0.2em] rounded border-2 border-yellow-400 shadow-[0_0_20px_rgba(242,169,0,0.6)] hover:scale-105 active:scale-95 transition-all duration-200"
+                                className="px-8 py-3 bg-konoha-orange/90 hover:bg-konoha-orange text-black font-bold font-ninja text-xl tracking-[0.2em] rounded border-2 border-yellow-400 shadow-chakra-lg hover:scale-105 active:scale-95 transition-all duration-200"
                             >
                                 {t('header.start')}
                             </button>

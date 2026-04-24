@@ -41,8 +41,8 @@ export const T9Keyboard: React.FC<T9KeyboardProps & { className?: string }> = ({
                         className={classNames(
                             'relative w-full h-full rounded-md flex flex-col justify-start items-start p-1 md:p-2 transition-all duration-200 border min-h-0 overflow-hidden group',
                             {
-                                'bg-konoha-orange border-konoha-orange text-black scale-105 z-10 shadow-[0_0_15px_#F2A900]': isActive,
-                                'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-750': !isActive
+                                'bg-konoha-orange border-konoha-orange text-black scale-105 z-10 shadow-chakra-md': isActive,
+                                'bg-gray-800 border-gray-600 text-gray-300': !isActive
                             }
                         )}
                     >
@@ -54,6 +54,8 @@ export const T9Keyboard: React.FC<T9KeyboardProps & { className?: string }> = ({
                             <img
                                 src={`${import.meta.env.BASE_URL}asset/${signKanji}.png`}
                                 alt=""
+                                loading="lazy"
+                                decoding="async"
                                 className="w-full h-full object-cover"
                                 onError={(e) => e.currentTarget.style.display = 'none'}
                             />

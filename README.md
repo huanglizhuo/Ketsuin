@@ -86,6 +86,11 @@ npm run dev
     ```
     *(Requires `python3`, `fonttools`, and `brotli`)*
 
+## Thanks
+
+https://github.com/Wangxs404/naruto-coding
+https://github.com/Kazuhito00/NARUTO-HandSignDetection
+
 ## License
 
 MIT

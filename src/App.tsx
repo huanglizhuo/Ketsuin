@@ -23,15 +23,16 @@ function App() {
   const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
-    const hasSeenTutorial = localStorage.getItem('ketsuin_tutorial_seen');
-    if (!hasSeenTutorial) {
+    const TUTORIAL_VERSION = 'v2';
+    const seenVersion = localStorage.getItem('ketsuin_tutorial_version');
+    if (seenVersion !== TUTORIAL_VERSION) {
       setShowHelp(true);
     }
   }, []);
 
   const handleCloseHelp = useCallback(() => {
     setShowHelp(false);
-    localStorage.setItem('ketsuin_tutorial_seen', 'true');
+    localStorage.setItem('ketsuin_tutorial_version', 'v2');
   }, []);
 
   const handleOpenHelp = useCallback(() => {
@@ -41,10 +42,14 @@ function App() {
   return (
     <div className="min-h-screen bg-ninja-black text-gray-200 font-sans flex flex-col overflow-hidden relative">
       {/* Background Image: Shinra Tensei */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
+      <div aria-hidden="true" className="absolute inset-0 z-0 pointer-events-none">
         <img
           src={`${import.meta.env.BASE_URL}asset/shinra.png`}
-          alt="Background"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          // @ts-expect-error — fetchpriority is valid HTML but not yet in React types
+          fetchpriority="low"
           className="w-full h-full object-cover blur-none scale-105 opacity-90"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80"></div>

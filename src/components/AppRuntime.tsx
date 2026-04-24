@@ -1,14 +1,29 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useDetector } from '../hooks/useDetector';
 import { Header } from './Header';
 import { SignOverlay } from './SignOverlay';
 import { EasterEggOverlay } from './EasterEggOverlay';
-import { ChallengeMode } from './challenge/ChallengeMode';
-import { Leaderboard } from './challenge/Leaderboard';
 import { T9View } from '../views/T9View';
 import { SignManager } from '../core/SignManager';
 import { T9Engine } from '../core/T9Engine';
+
+// Challenge + Leaderboard ship as separate chunks — they pull in
+// Supabase + html2canvas which the default T9 view never needs.
+const ChallengeMode = lazy(() =>
+    import('./challenge/ChallengeMode').then(m => ({ default: m.ChallengeMode }))
+);
+const Leaderboard = lazy(() =>
+    import('./challenge/Leaderboard').then(m => ({ default: m.Leaderboard }))
+);
+
+function RouteFallback() {
+    return (
+        <div className="flex-1 flex items-center justify-center p-8 text-konoha-orange font-mono text-sm">
+            <div className="w-8 h-8 border-2 border-konoha-orange border-t-transparent rounded-full animate-spin" />
+        </div>
+    );
+}
 
 interface AppRuntimeProps {
     initialJutsuId: string | null;
@@ -149,22 +164,26 @@ export function AppRuntime({
                         />
                     } />
                     <Route path="/challenge" element={
-                        <ChallengeMode
-                            videoRef={videoRef}
-                            detections={detections}
-                            isRunning={isRunning}
-                            start={start}
-                            stop={stop}
-                            initialJutsuId={initialJutsuId}
-                            onInitialJutsuConsumed={onInitialJutsuConsumed}
-                            onSignConfirmed={setLastConfirmedSign}
-                            mediaStream={mediaStream}
-                        />
+                        <Suspense fallback={<RouteFallback />}>
+                            <ChallengeMode
+                                videoRef={videoRef}
+                                detections={detections}
+                                isRunning={isRunning}
+                                start={start}
+                                stop={stop}
+                                initialJutsuId={initialJutsuId}
+                                onInitialJutsuConsumed={onInitialJutsuConsumed}
+                                onSignConfirmed={setLastConfirmedSign}
+                                mediaStream={mediaStream}
+                            />
+                        </Suspense>
                     } />
                     <Route path="/ranking" element={
-                        <div className="flex-1 flex flex-col gap-4 p-4 min-w-0 overflow-y-auto relative">
-                            <Leaderboard onBack={() => navigate('/')} />
-                        </div>
+                        <Suspense fallback={<RouteFallback />}>
+                            <div className="flex-1 flex flex-col gap-4 p-4 min-w-0 overflow-y-auto relative">
+                                <Leaderboard onBack={() => navigate('/')} />
+                            </div>
+                        </Suspense>
                     } />
                 </Routes>
             </main>

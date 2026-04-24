@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { HAND_SIGNS } from '../../config/data';
 import type { ChallengeState } from '../../core/ChallengeEngine';
 import { useI18n } from '../../i18n/I18nContext';
@@ -12,43 +12,46 @@ interface ChallengeArenaProps {
 
 export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children, showHandHints, onToggleHandHints }) => {
     const { selectedJutsu, phase, currentSignIndex, totalSigns, lastError, countdownValue } = state;
-    const [displayTime, setDisplayTime] = useState('0.000');
-    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-    const startRef = useRef(0);
+    const timerSpanRef = useRef<HTMLSpanElement>(null);
+    const rafRef = useRef<number | null>(null);
     const { t } = useI18n();
 
-    // Live timer during active phase
+    // rAF-driven timer: write directly to the DOM instead of React state.
+    // Avoids 60Hz re-renders of the entire arena subtree during active challenges.
     useEffect(() => {
-        if (phase === 'active') {
-            startRef.current = Date.now() - state.elapsedMs;
-            timerRef.current = setInterval(() => {
-                const elapsed = (Date.now() - startRef.current) / 1000;
-                setDisplayTime(elapsed.toFixed(3));
-            }, 16); // ~60fps timer update
-        } else {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-                timerRef.current = null;
+        const writeTime = (seconds: number) => {
+            if (timerSpanRef.current) {
+                timerSpanRef.current.textContent = seconds.toFixed(3);
             }
-            if (phase === 'complete') {
-                setDisplayTime((state.elapsedMs / 1000).toFixed(3));
-            }
-        }
-        return () => {
-            if (timerRef.current) clearInterval(timerRef.current);
         };
-    }, [phase]);
+
+        if (phase === 'active') {
+            const startedAt = Date.now() - state.elapsedMs;
+            const tick = () => {
+                writeTime((Date.now() - startedAt) / 1000);
+                rafRef.current = requestAnimationFrame(tick);
+            };
+            rafRef.current = requestAnimationFrame(tick);
+            return () => {
+                if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+            };
+        }
+
+        if (phase === 'complete') {
+            writeTime(state.elapsedMs / 1000);
+        } else if (phase === 'idle' || phase === 'countdown') {
+            writeTime(0);
+        }
+    }, [phase, state.elapsedMs]);
 
     if (!selectedJutsu) return null;
 
     const sequence = selectedJutsu.sequence;
 
-    // Current sign to perform
     const currentSign = phase === 'active' && currentSignIndex < sequence.length
         ? HAND_SIGNS.find(s => s.id === sequence[currentSignIndex])
         : null;
 
-    // Next sign preview
     const nextSign = phase === 'active' && currentSignIndex + 1 < sequence.length
         ? HAND_SIGNS.find(s => s.id === sequence[currentSignIndex + 1])
         : null;
@@ -57,10 +60,10 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children,
         <div className="flex flex-col gap-4 w-full max-w-4xl mx-auto relative">
             {/* Jutsu Title */}
             <div className="text-center">
-                <h2 className="text-xl md:text-2xl text-konoha-orange font-ninja-jp drop-shadow-[0_0_8px_rgba(242,169,0,0.4)]">
+                <h2 className="text-xl md:text-2xl text-konoha-orange font-ninja-jp drop-shadow-chakra-xs">
                     {selectedJutsu.name}
                 </h2>
-                <p className="text-xs text-gray-500 font-mono">{t(`jutsu.${selectedJutsu.id}.name` as keyof typeof import('../../i18n/translations').translations.en)}</p>
+                <p className="text-xs text-gray-400 font-mono">{t(`jutsu.${selectedJutsu.id}.name` as keyof typeof import('../../i18n/translations').translations.en)}</p>
             </div>
 
             {/* Countdown Overlay */}
@@ -68,9 +71,7 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children,
                 <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
                     <div
                         key={countdownValue}
-                        className="text-[10rem] md:text-[15rem] text-konoha-orange font-ninja leading-none select-none
-                       drop-shadow-[0_0_40px_rgba(242,169,0,0.8)]"
-                        style={{ animation: 'sekiro-flash 1s ease-out forwards' }}
+                        className="text-[10rem] md:text-[15rem] text-konoha-orange font-ninja leading-none select-none drop-shadow-chakra-2xl animate-sekiro-flash"
                     >
                         {countdownValue}
                     </div>
@@ -80,25 +81,27 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children,
             {/* Video Feed Area */}
             <div className="relative w-full max-w-2xl mx-auto z-0 shrink-0">
                 <div className={`relative aspect-video bg-black rounded-lg overflow-hidden border-2 shadow-2xl transition-colors duration-300
-          ${lastError ? 'border-red-500 shadow-[0_0_20px_#ff0000]' : 'border-gray-700 hover:border-konoha-orange'}`}
+          ${lastError ? 'border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.6)]' : 'border-gray-700 hover:border-konoha-orange'}`}
                 >
                     {children}
                     {/* Scanline */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent h-full w-full pointer-events-none animate-scan"></div>
+                    <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent h-full w-full pointer-events-none animate-scan"></div>
                 </div>
             </div>
 
             {/* Toggle Hints Button */}
             <button
                 onClick={onToggleHandHints}
-                className="absolute top-2 right-2 md:top-0 md:right-0 md:translate-x-[120%] p-2 rounded-full
-                           text-white/30 hover:text-konoha-orange hover:bg-white/5 transition-all z-40"
+                aria-label={showHandHints ? "Hide hand hints" : "Show hand hints"}
+                aria-pressed={showHandHints}
                 title={showHandHints ? "Hide Hand Hints" : "Show Hand Hints"}
+                className="absolute top-2 right-2 md:top-0 md:right-0 md:translate-x-[120%] p-2.5 rounded-full
+                           text-white/40 hover:text-konoha-orange hover:bg-white/5 transition-all z-40"
             >
                 {showHandHints ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
                 ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" /><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" /><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" /><line x1="2" x2="22" y1="2" y2="22" /></svg>
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" /><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" /><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" /><line x1="2" x2="22" y1="2" y2="22" /></svg>
                 )}
             </button>
 
@@ -106,14 +109,15 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children,
             {phase === 'active' && currentSign && (
                 <div className="flex items-center justify-center gap-6">
                     {/* Current sign - large */}
-                    <div className={`flex flex-col items-center transition-all duration-200 ${lastError ? 'animate-[head-shake_0.5s]' : ''}`}>
+                    <div className={`flex flex-col items-center transition-all duration-200 ${lastError ? 'animate-head-shake' : ''}`}>
                         {showHandHints ? (
                             <div className={`w-32 h-32 md:w-48 md:h-48 relative transition-transform duration-200
                                 ${lastError ? 'scale-110' : 'scale-100'}`}>
                                 <img
                                     src={`${import.meta.env.BASE_URL}asset/${currentSign.kanji}.png`}
                                     alt={currentSign.name}
-                                    className={`w-full h-full object-contain filter drop-shadow-[0_0_15px_rgba(242,169,0,0.6)]
+                                    decoding="async"
+                                    className={`w-full h-full object-contain filter drop-shadow-chakra-md
                                         ${lastError ? 'grayscale sepia hue-rotate-[-50deg] brightness-125 drop-shadow-[0_0_20px_rgba(255,0,0,0.8)]' : ''}
                                     `}
                                 />
@@ -122,17 +126,17 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children,
                             <span className={`text-[6rem] md:text-[8rem] font-ninja-jp leading-none select-none
                   ${lastError
                                     ? 'text-red-500 drop-shadow-[0_0_20px_rgba(255,0,0,0.8)]'
-                                    : 'text-konoha-orange drop-shadow-[0_0_20px_rgba(242,169,0,0.6)]'
+                                    : 'text-konoha-orange drop-shadow-chakra-lg'
                                 }`}
                             >
                                 {currentSign.kanji}
                             </span>
                         )}
-                        <span className="text-sm text-gray-400 font-mono mt-1">
+                        <span className="text-sm text-gray-300 font-mono mt-1">
                             {currentSign.name}
                         </span>
                         {lastError && (
-                            <span className="text-red-400 text-xs font-mono mt-1 animate-pulse">
+                            <span className="text-red-400 text-xs font-mono mt-1">
                                 {t('arena.retry')}
                             </span>
                         )}
@@ -141,12 +145,12 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children,
                     {/* Arrow + Next sign preview */}
                     {nextSign && (
                         <>
-                            <span className="text-3xl text-gray-600">→</span>
+                            <span aria-hidden="true" className="text-3xl text-gray-500">→</span>
                             <div className="flex flex-col items-center opacity-40">
-                                <span className="text-[3rem] md:text-[4rem] font-ninja-jp text-gray-400 leading-none">
+                                <span className="text-[3rem] md:text-[4rem] font-ninja-jp text-gray-300 leading-none">
                                     {nextSign.kanji}
                                 </span>
-                                <span className="text-xs text-gray-600 font-mono mt-1">
+                                <span className="text-xs text-gray-400 font-mono mt-1">
                                     {nextSign.name}
                                 </span>
                             </div>
@@ -157,13 +161,17 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children,
 
             {/* Progress Bar */}
             {(phase === 'active' || phase === 'complete') && (
-                <div className="bg-black/30 backdrop-blur-sm border border-white/10 rounded-lg p-3">
+                <div className="bg-black/60 border border-white/10 rounded-lg p-3">
                     {/* Timer */}
                     <div className="text-center mb-2">
-                        <span className="text-3xl md:text-4xl text-konoha-orange font-mono font-bold tabular-nums tracking-wider
-                           drop-shadow-[0_0_10px_rgba(242,169,0,0.4)]">
-                            {displayTime}s
+                        <span
+                            ref={timerSpanRef}
+                            aria-live="off"
+                            className="text-3xl md:text-4xl text-konoha-orange font-mono font-bold tabular-nums tracking-wider drop-shadow-chakra-sm"
+                        >
+                            0.000
                         </span>
+                        <span className="text-3xl md:text-4xl text-konoha-orange font-mono font-bold">s</span>
                     </div>
 
                     {/* Seal Progress */}
@@ -181,13 +189,13 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children,
                                             ? 'text-konoha-orange scale-100'
                                             : isCurrent
                                                 ? 'text-white scale-110 bg-konoha-orange/20 ring-1 ring-konoha-orange/50'
-                                                : 'text-gray-600 scale-90 opacity-50'
+                                                : 'text-gray-500 scale-90 opacity-60'
                                         }`}
                                 >
                                     <span className="text-lg font-ninja-jp leading-none">
                                         {sign?.kanji || '?'}
                                     </span>
-                                    <span className="text-[7px] font-mono">
+                                    <span className="text-xs md:text-[10px] font-mono tabular-nums">
                                         {i + 1}
                                     </span>
                                 </div>
@@ -197,23 +205,12 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children,
 
                     {/* Count */}
                     <div className="text-center mt-1">
-                        <span className="text-xs text-gray-500 font-mono">
+                        <span className="text-xs text-gray-400 font-mono tabular-nums">
                             {currentSignIndex} / {totalSigns} {t('jutsu.seals')}
                         </span>
                     </div>
                 </div>
             )}
-
-            {/* Inline keyframe for error shake */}
-            <style>{`
-        @keyframes head-shake {
-          0% { transform: translateX(0); }
-          25% { transform: translateX(-8px); }
-          50% { transform: translateX(8px); }
-          75% { transform: translateX(-4px); }
-          100% { transform: translateX(0); }
-        }
-      `}</style>
         </div>
     );
 };

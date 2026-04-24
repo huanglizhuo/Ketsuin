@@ -51,7 +51,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
         <div className="flex flex-col gap-4 w-full max-w-2xl mx-auto">
             {/* Header */}
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl text-konoha-orange font-ninja drop-shadow-[0_0_8px_rgba(242,169,0,0.4)]">
+                <h2 className="text-2xl text-konoha-orange font-ninja drop-shadow-chakra-xs">
                     {t('leaderboard.title')}
                 </h2>
                 <button
@@ -63,7 +63,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
             </div>
 
             {/* Data source indicator */}
-            <p className="text-[10px] text-gray-600 font-mono">
+            <p className="text-xs text-gray-400 font-mono">
                 {isSupabaseConfigured() ? t('leaderboard.global') : t('leaderboard.local')}
             </p>
 
@@ -86,28 +86,28 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
 
             {/* Jutsu Info */}
             {selectedJutsu && (
-                <div className="text-center text-xs text-gray-500 font-mono">
+                <div className="text-center text-xs text-gray-400 font-mono">
                     {selectedJutsu.nameEn} · {selectedJutsu.sequence.length} {t('jutsu.seals')} · {'⭐'.repeat(selectedJutsu.difficulty)}
                 </div>
             )}
 
             {/* Leaderboard Table */}
-            <div className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden">
+            <div className="bg-black/60 border border-white/10 rounded-lg overflow-hidden">
                 {loading ? (
-                    <div className="p-8 text-center text-gray-500 font-mono animate-pulse">
+                    <div className="p-8 text-center text-gray-400 font-mono">
                         {t('leaderboard.loading')}
                     </div>
                 ) : error ? (
                     <div className="p-8 text-center text-red-400 font-mono">{error}</div>
                 ) : entries.length === 0 ? (
-                    <div className="p-8 text-center text-gray-500 font-mono">
+                    <div className="p-8 text-center text-gray-400 font-mono">
                         <p className="text-lg mb-1">{t('leaderboard.empty')}</p>
                         <p className="text-xs">{t('leaderboard.emptyHint')}</p>
                     </div>
                 ) : (
                     <div className="divide-y divide-white/5">
                         {/* Header Row */}
-                        <div className="grid grid-cols-[50px_1fr_80px_80px] px-4 py-2 text-[10px] text-gray-600 font-mono uppercase">
+                        <div className="grid grid-cols-[2.5rem_1fr_auto_auto] gap-3 px-4 py-2 text-xs text-gray-400 font-mono uppercase">
                             <span>{t('leaderboard.rank')}</span>
                             <span>{t('leaderboard.ninja')}</span>
                             <span className="text-right">{t('leaderboard.time')}</span>
@@ -122,28 +122,31 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                             return (
                                 <div
                                     key={entry.id || i}
-                                    className={`grid grid-cols-[50px_1fr_80px_80px] px-4 py-2.5 items-center transition-all
+                                    className={`grid grid-cols-[2.5rem_1fr_auto_auto] gap-3 px-4 py-2.5 items-center transition-all
                     ${isPlayer
-                                            ? 'bg-konoha-orange/10 border-l-2 border-l-konoha-orange'
+                                            ? 'bg-konoha-orange/15'
                                             : i < 3
                                                 ? 'bg-white/[0.02]'
                                                 : ''
                                         } `}
                                 >
                                     {/* Rank Number */}
-                                    <span className={`font-mono font-bold text-sm
-                    ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-gray-300' : i === 2 ? 'text-amber-600' : 'text-gray-500'} `}
+                                    <span className={`font-mono font-bold text-sm tabular-nums
+                    ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-gray-200' : i === 2 ? 'text-amber-500' : 'text-gray-400'} `}
                                     >
                                         #{i + 1}
                                     </span>
 
                                     {/* Ninja Name */}
                                     <div className="flex items-center gap-2 min-w-0">
+                                        {isPlayer && (
+                                            <span aria-hidden="true" className="text-konoha-orange shrink-0">▸</span>
+                                        )}
                                         <span className="text-sm text-gray-200 truncate">
                                             {entry.ninja_name}
                                         </span>
                                         {isPlayer && (
-                                            <span className="text-[10px] text-konoha-orange font-mono shrink-0">{t('leaderboard.you')}</span>
+                                            <span className="text-xs text-konoha-orange font-mono shrink-0">{t('leaderboard.you')}</span>
                                         )}
                                     </div>
 

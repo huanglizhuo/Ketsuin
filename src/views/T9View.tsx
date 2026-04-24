@@ -59,7 +59,7 @@ export const T9View: React.FC<T9ViewProps> = ({
                 </div>
 
                 {/* Status Indicator */}
-                <div className="absolute top-4 left-4 px-2 py-1 bg-black/80 border border-green-500 text-green-500 text-xs font-mono rounded backdrop-blur-sm shadow flex flex-col gap-1">
+                <div className="absolute top-4 left-4 px-2 py-1 bg-black/80 border border-konoha-orange/50 text-konoha-orange text-xs font-mono rounded shadow flex flex-col gap-1 tabular-nums">
                     <span>SYS: {isRunning ? t('t9.status.active') : t('t9.status.standby')}</span>
                 </div>
             </div>
@@ -68,10 +68,10 @@ export const T9View: React.FC<T9ViewProps> = ({
             <div className="flex-1 flex flex-col md:flex-row gap-4 min-h-0 shrink-0">
                 {/* Left Col: T9 Keyboard Reference */}
                 <div className="flex-1 flex flex-col gap-2 min-w-0 justify-center order-2 md:order-1">
-                    <div className="rounded-lg p-2 flex-1 flex flex-col justify-center backdrop-blur-sm bg-black/30 border border-white/10">
-                        <h3 className="text-x text-gray-400 font-mono text-center mb-2 uppercase tracking-widest text-shadow">{t('t9.keypad')}</h3>
+                    <div className="rounded-lg p-2 flex-1 flex flex-col justify-center bg-black/60 border border-white/10">
+                        <h3 className="text-xs text-gray-300 font-mono text-center mb-2 uppercase tracking-widest">{t('t9.keypad')}</h3>
                         <T9Keyboard activeSignId={activeSignId} />
-                        <div className="text-center text-gray-400 text-[20px] font-mono mt-2 text-shadow">
+                        <div className="text-center text-gray-300 text-base font-mono mt-2">
                             {t('t9.hint')}
                         </div>
                     </div>

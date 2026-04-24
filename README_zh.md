@@ -74,6 +74,11 @@ npm run dev
 -   **ONNX Runtime Web**: 在浏览器中运行 YOLOX 目标检测模型。
 -   **Tailwind CSS**: 样式和响应式设计。
 
+## Thanks
+
+https://github.com/Wangxs404/naruto-coding
+https://github.com/Kazuhito00/NARUTO-HandSignDetection
+
 ## 许可证
 
 MIT

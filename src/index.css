@@ -10,20 +10,84 @@
 
 @theme {
   --font-sans: "AaJianMingShouShu-2", system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+  /* Palette */
   --color-konoha-orange: #F2A900;
   --color-akatsuki-red: #980000;
-  --color-akatsuki-cloud: #BF0000;
   --color-ninja-black: #0f0f0f;
+  --color-ink: #0a0a0a; /* darker surface for elevated cards */
   --color-chakra-blue: #00BFFF;
-  --color-headband-blue: #001F3F;
-  --color-scroll-cream: #F5E6BC;
 
   --font-ninja: "AaJianMingShouShu-2", "Courier New", Courier, monospace;
   --font-ninja-jp: "Reggae One", serif;
   --font-mono: "AaJianMingShouShu-2", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-  --animate-pulse-fast: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  --animate-spin-slow: spin 3s linear infinite;
+  /* Box-shadow scale (chakra glow on cards/buttons) */
+  --shadow-chakra-xs: 0 0 30px rgba(242, 169, 0, 0.1);   /* ambient diffuse (large cards) */
+  --shadow-chakra-sm: 0 0 20px rgba(242, 169, 0, 0.15);  /* subtle hover */
+  --shadow-chakra-md: 0 0 15px rgba(242, 169, 0, 0.5);   /* accent (T9 active key) */
+  --shadow-chakra-lg: 0 0 20px rgba(242, 169, 0, 0.6);   /* strong button halo */
+  --shadow-chakra-xl: 0 0 50px rgba(242, 169, 0, 0.2);   /* large diffuse (modal) */
+  --shadow-chakra-2xl: 0 0 40px rgba(242, 169, 0, 0.3);  /* hero ambient */
+
+  /* Drop-shadow scale (chakra glow on text/svg) */
+  --drop-shadow-chakra-xs: 0 0 8px rgba(242, 169, 0, 0.4);
+  --drop-shadow-chakra-sm: 0 0 10px rgba(242, 169, 0, 0.5);
+  --drop-shadow-chakra-md: 0 0 15px rgba(242, 169, 0, 0.6);
+  --drop-shadow-chakra-lg: 0 0 20px rgba(242, 169, 0, 0.6);
+  --drop-shadow-chakra-xl: 0 0 30px rgba(242, 169, 0, 0.8);
+  --drop-shadow-chakra-2xl: 0 0 40px rgba(242, 169, 0, 0.8);
+
+  /* Registered animations */
+  --animate-scan: scan 3s linear infinite;
+  --animate-fade-in: fade-in 0.2s ease-out forwards;
+  --animate-sekiro-flash: sekiro-flash 1s ease-out forwards;
+  --animate-card-enter: card-enter 0.3s ease-out forwards;
+  --animate-head-shake: head-shake 0.5s ease-in-out;
+  --animate-fade-in-up: fade-in-up 2s ease-out forwards;
+  --animate-calendar-tear: calendar-tear 1.8s ease-in-out forwards;
+}
+
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sekiro-flash {
+  0% { opacity: 0; transform: scale(0.5); }
+  15% { opacity: 1; transform: scale(1.0); filter: drop-shadow(0 0 50px rgba(242, 169, 0, 1)); }
+  20% { transform: scale(1.05); }
+  25% { transform: scale(1.0); }
+  100% { opacity: 0; transform: scale(1.4); filter: drop-shadow(0 0 10px rgba(242, 169, 0, 0)); }
+}
+
+@keyframes card-enter {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes head-shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  50% { transform: translateX(8px); }
+  75% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes calendar-tear {
+  0% { transform: rotate(0deg); opacity: 1; }
+  20% { transform: rotate(-5deg); }
+  100% { transform: rotate(120deg) translate(-100px, 600px); opacity: 0; }
 }
 
 :root {
@@ -31,6 +95,7 @@
   line-height: 1.5;
   font-weight: 400;
   color-scheme: dark;
+  accent-color: var(--color-konoha-orange);
 }
 
 body {
@@ -39,4 +104,27 @@ body {
   min-height: 100vh;
   background-color: var(--color-ninja-black);
   color: white;
+}
+
+/* Global keyboard-only focus ring — WCAG 2.4.7.
+   Every button, link, and role="button" gets a visible indicator when focus
+   arrives via keyboard. Mouse click does not trigger it. */
+@layer base {
+  :where(button, a, [role="button"], [role="tab"], [role="option"], summary, input, textarea, select):focus-visible {
+    outline: 2px solid var(--color-konoha-orange);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+}
+
+/* Respect users who opt out of motion — WCAG 2.3.3. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

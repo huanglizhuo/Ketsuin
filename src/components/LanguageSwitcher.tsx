@@ -67,11 +67,12 @@ export const LanguageSwitcher: React.FC = () => {
             <button
                 ref={buttonRef}
                 onClick={() => setOpen(prev => !prev)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-black/40 border border-white/20 rounded
-                           text-xs font-mono text-gray-300
+                className="flex items-center gap-1.5 px-3 py-3 min-h-11 bg-black/40 border border-white/20 rounded
+                           text-xs font-mono text-gray-200
                            hover:border-konoha-orange/50 hover:text-white transition-all duration-200"
                 aria-haspopup="listbox"
                 aria-expanded={open}
+                aria-label="Change language"
                 title="Language"
             >
                 <span className="text-base leading-none">{current.flag}</span>
@@ -84,8 +85,8 @@ export const LanguageSwitcher: React.FC = () => {
                 <div
                     ref={dropdownRef}
                     className="fixed bg-gray-900/95 backdrop-blur-md
-                               border border-white/20 rounded-lg shadow-[0_8px_30px_rgba(0,0,0,0.5)]
-                               overflow-hidden min-w-[140px]"
+                               border border-white/20 rounded-lg shadow-2xl
+                               overflow-hidden min-w-36"
                     style={{ top: pos.top, right: pos.right, zIndex: 9999 }}
                     role="listbox"
                     aria-activedescendant={`lang-${locale}`}
@@ -100,7 +101,7 @@ export const LanguageSwitcher: React.FC = () => {
                                 role="option"
                                 aria-selected={isActive}
                                 onClick={() => { setLocale(l); setOpen(false); }}
-                                className={`flex items-center gap-2.5 w-full px-3 py-2 text-left text-sm font-mono
+                                className={`flex items-center gap-2.5 w-full px-3 py-2.5 min-h-11 text-left text-sm font-mono
                                             transition-colors duration-150
                                     ${isActive
                                         ? 'bg-konoha-orange/15 text-konoha-orange font-bold'

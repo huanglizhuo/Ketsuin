@@ -57,7 +57,7 @@ export const T9EditorDisplay: React.FC<T9InputState> = ({
     );
 
     return (
-        <div className="bg-black/30 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden shadow-lg flex flex-col h-full min-h-[200px]">
+        <div className="bg-black/60 border border-white/10 rounded-lg overflow-hidden shadow-lg flex flex-col h-full min-h-[200px]">
             {/* Editor Container */}
             <div className="relative flex-[2] w-full h-full overflow-hidden">
 
@@ -95,7 +95,7 @@ export const T9EditorDisplay: React.FC<T9InputState> = ({
 
                 {/* Placeholder (Only if empty) */}
                 {committedText.length === 0 && (
-                    <div className="absolute inset-0 p-4 font-mono text-lg text-gray-500 pointer-events-none">
+                    <div className="absolute inset-0 p-4 font-mono text-lg text-gray-400 pointer-events-none">
                         {t('t9.placeholder')}
                     </div>
                 )}
@@ -103,15 +103,15 @@ export const T9EditorDisplay: React.FC<T9InputState> = ({
 
             {/* Gesture Input List (Reverse Mapped) */}
             <div className="flex-1 bg-black/20 p-2 overflow-x-auto flex items-center gap-2 border-b border-t border-white/10 min-h-[60px] shrink-0">
-                <span className="text-xs text-gray-500 font-mono shrink-0 uppercase tracking-widest mr-2">{t('t9.seals')}</span>
+                <span className="text-xs text-gray-400 font-mono shrink-0 uppercase tracking-widest mr-2">{t('t9.seals')}</span>
                 {fullSignSequence.map((signId, i) => {
                     const sign = HAND_SIGNS.find(s => s.id === signId);
                     return (
                         <div key={i} className="flex flex-col items-center justify-center min-w-[30px]">
-                            <span className="text-konoha-orange text-xl font-bold font-ninja-jp drop-shadow-[0_0_2px_rgba(242,169,0,0.5)]">
+                            <span className="text-konoha-orange text-xl font-bold font-ninja-jp drop-shadow-chakra-xs">
                                 {sign?.kanji || '?'}
                             </span>
-                            <span className="text-[8px] text-gray-500 font-mono">
+                            <span className="text-[11px] text-gray-400 font-mono tabular-nums">
                                 {signId === 11 ? 'SPC' : signId}
                             </span>
                         </div>
@@ -121,13 +121,13 @@ export const T9EditorDisplay: React.FC<T9InputState> = ({
 
             {/* Candidate Bar (Bottom of Editor) */}
             <div className="bg-black/40 border-t border-white/10 p-2 flex items-center gap-3 overflow-x-auto shrink-0">
-                <span className="text-xs text-gray-500 font-mono">{t('t9.input')}</span>
+                <span className="text-xs text-gray-400 font-mono">{t('t9.input')}</span>
                 <span className="text-konoha-orange font-bold font-mono tracking-widest min-w-[20px]">{currentSequence}</span>
 
                 {/* Candidates */}
                 <div className="flex-1 flex gap-2 overflow-hidden mask-linear-fade">
                     {candidates.length === 0 ? (
-                        <span className="text-gray-600 italic text-sm">...</span>
+                        <span className="text-gray-500 italic text-sm">...</span>
                     ) : (
                         candidates.map((cand, idx) => (
                             <span
@@ -136,7 +136,7 @@ export const T9EditorDisplay: React.FC<T9InputState> = ({
                                     "px-2 py-0.5 rounded text-sm transition-all whitespace-nowrap",
                                     {
                                         "bg-konoha-orange text-black font-bold": idx === candidateIndex,
-                                        "text-gray-400": idx !== candidateIndex
+                                        "text-gray-300": idx !== candidateIndex
                                     }
                                 )}
                             >
