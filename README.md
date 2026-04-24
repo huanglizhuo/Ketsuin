@@ -89,6 +89,7 @@ npm run dev
 ## Thanks
 
 https://github.com/Wangxs404/naruto-coding
+
 https://github.com/Kazuhito00/NARUTO-HandSignDetection
 
 ## License
