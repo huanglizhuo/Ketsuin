@@ -9,6 +9,12 @@
             "permanent": true
         }
     ],
+    "rewrites": [
+        {
+            "source": "/((?!asset|model|.*\\.).*)",
+            "destination": "/index.html"
+        }
+    ],
     "headers": [
         {
             "source": "/(.*)",
