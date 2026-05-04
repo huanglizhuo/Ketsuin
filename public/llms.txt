@@ -1,0 +1,30 @@
+# Ketsuin (結印)
+
+> Ninja Hand Sign Input Method — type with your hands using AI-powered webcam detection.
+
+## Overview
+
+Ketsuin is a free, open-source web application that lets you type text using 12 ninja hand signs (based on the zodiac seals from Japanese ninja tradition). It uses a YOLOX-Nano object detection model running in the browser via ONNX Runtime WebAssembly to recognize hand signs from your webcam feed, then maps them through a T9 predictive text engine to produce characters.
+
+## Key Features
+
+- Real-time hand sign detection via webcam (YOLOX-Nano, ONNX Runtime WASM)
+- T9 predictive text input mapped to 12 ninja seals
+- Challenge mode: compete on jutsu sequences against global leaderboard
+- 9 jutsu challenges from Chidori (4 seals) to Water Dragon (44 seals)
+- Ninja ranking system: Genin through Six Paths
+- Three languages: English, Chinese (中文), Japanese (日本語)
+- Works entirely in-browser, no server-side processing for detection
+
+## Technical Stack
+
+- React 19, TypeScript, Vite 7, Tailwind CSS v4
+- ONNX Runtime Web (WASM) for ML inference
+- YOLOX-Nano model for hand sign detection
+- Supabase for leaderboard data
+- Hosted on Vercel
+
+## Links
+
+- Website: https://ketsuin.clothpath.com/
+- Source: https://github.com/huanglizhuo/Ketsuin

@@ -54,6 +54,12 @@ export const Header = memo(function Header({ onOpenHelp, onBeforeNavigate }: Hea
                         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></svg>
                     </button>
 
+                    <Link to="/about" className="text-gray-400 hover:text-white text-sm transition-colors px-2 py-1 hidden sm:block">
+                        About
+                    </Link>
+                    <Link to="/hand-signs" className="text-gray-400 hover:text-white text-sm transition-colors px-2 py-1 hidden sm:block">
+                        Hand Signs
+                    </Link>
                     <a
                         href="https://github.com/huanglizhuo/Ketsuin"
                         target="_blank"

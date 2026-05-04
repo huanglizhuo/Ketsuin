@@ -62,7 +62,7 @@ export const T9Keyboard: React.FC<T9KeyboardProps & { className?: string }> = ({
                         </div>
 
                         {/* Top Left: Number/Sign ID */}
-                        <span className="text-[10px] md:text-lg text-konoha-orange font-mono opacity-100 z-10 mb-0.5">
+                        <span className="text-xs md:text-lg text-konoha-orange font-mono opacity-100 z-10 mb-0.5">
                             {key.signId === 10 ? '*' : key.signId === 11 ? '0' : key.signId === 12 ? '#' : key.id}
                         </span>
                         {/* Letters/Func (Below Number) */}

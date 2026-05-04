@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Reggae+One&display=swap" rel="stylesheet" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="canonical" href="https://ketsuin.clothpath.com/" />
 
   <!-- SEO Meta Tags -->
   <title>Ketsuin 結印 - Ninja Hand Sign Input Method</title>
@@ -37,29 +38,84 @@
 
   <!-- JSON-LD Structured Data -->
   <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Ketsuin",
-      "alternateName": "結印",
-      "applicationCategory": "UtilityApplication",
-      "operatingSystem": "Web Browser",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Ketsuin",
+        "alternateName": "結印",
+        "url": "https://ketsuin.clothpath.com/",
+        "image": "https://ketsuin.clothpath.com/asset/ketsuin.png",
+        "applicationCategory": "UtilityApplication",
+        "operatingSystem": "Web Browser",
+        "softwareVersion": "1.0.0",
+        "dateModified": "2026-05-04",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "description": "A web-based input method that uses AI to detect ninja hand signs via webcam and converts them to text using T9 logic.",
+        "author": {
+          "@type": "Person",
+          "name": "Huang Lizhuo"
+        }
       },
-      "description": "A web-based input method that uses AI to detect ninja hand signs via webcam and converts them to text using T9 logic.",
-      "author": {
-        "@type": "Person",
-        "name": "Huang Lizhuo"
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Ketsuin 結印",
+        "url": "https://ketsuin.clothpath.com/",
+        "description": "Ninja Hand Sign Input Method powered by AI. Use 12 ancient hand seals to type text via webcam.",
+        "inLanguage": ["en", "zh", "ja"]
       }
-    }
+    ]
   </script>
 </head>
 
 <body>
-  <div id="root"></div>
+  <noscript>
+    <div style="max-width:600px;margin:2rem auto;padding:2rem;font-family:system-ui,sans-serif;color:#e5e5e5;background:#0f0f0f;text-align:center">
+      <h1 style="color:#F2A900">Ketsuin 結印</h1>
+      <p>This application requires JavaScript to run. Please enable JavaScript in your browser settings to use the Ninja Hand Sign Input Method.</p>
+      <p style="margin-top:1rem;font-size:0.9rem;color:#888">Ketsuin uses your webcam and AI to detect 12 ninja hand signs and convert them to text. All processing happens in your browser.</p>
+    </div>
+  </noscript>
+  <div id="root">
+    <div style="font-family:system-ui,sans-serif;max-width:800px;margin:0 auto;padding:2rem;color:#e5e5e5;background:#0f0f0f;min-height:100vh">
+      <h1 style="color:#F2A900;font-size:2rem;margin-bottom:1rem">Ketsuin 結印 — Ninja Hand Sign Input Method</h1>
+      <p>Ketsuin is a web-based input method that lets you type text using ninja hand signs detected through your webcam. Powered by YOLOX-Nano object detection and T9 predictive text logic, it recognizes 12 ancient hand seals and converts them into characters in real time.</p>
+      <h2 style="color:#F2A900;font-size:1.5rem;margin:2rem 0 0.5rem">How It Works</h2>
+      <p>Point your webcam at your hands and form one of the 12 ninja seals. The AI model detects each sign and maps it to a T9 key group. Combine signs to spell words, just like typing on an old mobile phone — but with your hands in the air.</p>
+      <h2 style="color:#F2A900;font-size:1.5rem;margin:2rem 0 0.5rem">12 Hand Signs</h2>
+      <table style="width:100%;border-collapse:collapse;margin:1rem 0">
+        <thead><tr><th style="border:1px solid #333;padding:0.5rem;background:#1a1a1a;color:#F2A900">Key</th><th style="border:1px solid #333;padding:0.5rem;background:#1a1a1a;color:#F2A900">Sign</th><th style="border:1px solid #333;padding:0.5rem;background:#1a1a1a;color:#F2A900">Kanji</th><th style="border:1px solid #333;padding:0.5rem;background:#1a1a1a;color:#F2A900">Letters</th></tr></thead>
+        <tbody>
+          <tr><td style="border:1px solid #333;padding:0.5rem">1</td><td style="border:1px solid #333;padding:0.5rem">Rat</td><td style="border:1px solid #333;padding:0.5rem">子</td><td style="border:1px solid #333;padding:0.5rem">.,?!</td></tr>
+          <tr><td style="border:1px solid #333;padding:0.5rem">2</td><td style="border:1px solid #333;padding:0.5rem">Ox</td><td style="border:1px solid #333;padding:0.5rem">丑</td><td style="border:1px solid #333;padding:0.5rem">ABC</td></tr>
+          <tr><td style="border:1px solid #333;padding:0.5rem">3</td><td style="border:1px solid #333;padding:0.5rem">Tiger</td><td style="border:1px solid #333;padding:0.5rem">寅</td><td style="border:1px solid #333;padding:0.5rem">DEF</td></tr>
+          <tr><td style="border:1px solid #333;padding:0.5rem">4</td><td style="border:1px solid #333;padding:0.5rem">Hare</td><td style="border:1px solid #333;padding:0.5rem">卯</td><td style="border:1px solid #333;padding:0.5rem">GHI</td></tr>
+          <tr><td style="border:1px solid #333;padding:0.5rem">5</td><td style="border:1px solid #333;padding:0.5rem">Dragon</td><td style="border:1px solid #333;padding:0.5rem">辰</td><td style="border:1px solid #333;padding:0.5rem">JKL</td></tr>
+          <tr><td style="border:1px solid #333;padding:0.5rem">6</td><td style="border:1px solid #333;padding:0.5rem">Snake</td><td style="border:1px solid #333;padding:0.5rem">巳</td><td style="border:1px solid #333;padding:0.5rem">MNO</td></tr>
+          <tr><td style="border:1px solid #333;padding:0.5rem">7</td><td style="border:1px solid #333;padding:0.5rem">Horse</td><td style="border:1px solid #333;padding:0.5rem">午</td><td style="border:1px solid #333;padding:0.5rem">PQRS</td></tr>
+          <tr><td style="border:1px solid #333;padding:0.5rem">8</td><td style="border:1px solid #333;padding:0.5rem">Ram</td><td style="border:1px solid #333;padding:0.5rem">未</td><td style="border:1px solid #333;padding:0.5rem">TUV</td></tr>
+          <tr><td style="border:1px solid #333;padding:0.5rem">9</td><td style="border:1px solid #333;padding:0.5rem">Monkey</td><td style="border:1px solid #333;padding:0.5rem">申</td><td style="border:1px solid #333;padding:0.5rem">WXYZ</td></tr>
+          <tr><td style="border:1px solid #333;padding:0.5rem">0</td><td style="border:1px solid #333;padding:0.5rem">Dog (Space)</td><td style="border:1px solid #333;padding:0.5rem">戌</td><td style="border:1px solid #333;padding:0.5rem">SPC</td></tr>
+          <tr><td style="border:1px solid #333;padding:0.5rem">*</td><td style="border:1px solid #333;padding:0.5rem">Bird (Delete)</td><td style="border:1px solid #333;padding:0.5rem">酉</td><td style="border:1px solid #333;padding:0.5rem">DEL</td></tr>
+          <tr><td style="border:1px solid #333;padding:0.5rem">#</td><td style="border:1px solid #333;padding:0.5rem">Boar (Next)</td><td style="border:1px solid #333;padding:0.5rem">亥</td><td style="border:1px solid #333;padding:0.5rem">NEXT</td></tr>
+        </tbody>
+      </table>
+      <h2 style="color:#F2A900;font-size:1.5rem;margin:2rem 0 0.5rem">Challenge Mode</h2>
+      <p>Test your hand sign speed against other ninjas worldwide. Choose a jutsu, perform the hand seal sequence as fast as possible, and compete on the global leaderboard. Ranks range from Genin (rookie) to Six Paths (godlike speed).</p>
+      <h2 style="color:#F2A900;font-size:1.5rem;margin:2rem 0 0.5rem">Frequently Asked Questions</h2>
+      <h3 style="color:#F2A900;font-size:1.1rem;margin:1rem 0 0.3rem">Do I need a webcam?</h3>
+      <p>Yes, for hand sign detection mode. You can also use keyboard keys 1-9 as an alternative input method.</p>
+      <h3 style="color:#F2A900;font-size:1.1rem;margin:1rem 0 0.3rem">What technology does it use?</h3>
+      <p>YOLOX-Nano for hand sign detection, ONNX Runtime WebAssembly for inference in the browser, and a T9 engine for predictive text input. No data leaves your device.</p>
+      <h3 style="color:#F2A900;font-size:1.1rem;margin:1rem 0 0.3rem">Is it free?</h3>
+      <p>Yes, completely free and open source.</p>
+    </div>
+  </div>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 

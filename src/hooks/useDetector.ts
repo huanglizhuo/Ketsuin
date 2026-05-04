@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { YoloxDetector } from '../core/yolox';
 import type { Detection } from '../core/yolox';
+import type { YoloxDetector } from '../core/yolox';
 
 export type { Detection };
 
@@ -91,6 +91,7 @@ export function useDetector(
         if (!detectorRef.current) {
             setLoading(true);
             try {
+                const { YoloxDetector } = await import('../core/yolox');
                 const detector = new YoloxDetector();
                 await detector.load(modelPath);
                 detectorRef.current = detector;

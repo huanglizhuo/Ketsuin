@@ -16,6 +16,8 @@ const ChallengeMode = lazy(() =>
 const Leaderboard = lazy(() =>
     import('./challenge/Leaderboard').then(m => ({ default: m.Leaderboard }))
 );
+const AboutView = lazy(() => import('../views/AboutView'));
+const HandSignsView = lazy(() => import('../views/HandSignsView'));
 
 function RouteFallback() {
     return (
@@ -183,6 +185,16 @@ export function AppRuntime({
                             <div className="flex-1 flex flex-col gap-4 p-4 min-w-0 overflow-y-auto relative">
                                 <Leaderboard onBack={() => navigate('/')} />
                             </div>
+                        </Suspense>
+                    } />
+                    <Route path="/about" element={
+                        <Suspense fallback={<RouteFallback />}>
+                            <AboutView />
+                        </Suspense>
+                    } />
+                    <Route path="/hand-signs" element={
+                        <Suspense fallback={<RouteFallback />}>
+                            <HandSignsView />
                         </Suspense>
                     } />
                 </Routes>
