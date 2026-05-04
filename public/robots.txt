@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ketsuin.vercel.app/sitemap.xml
+Sitemap: https://ketsuin.clothpath.com/sitemap.xml
