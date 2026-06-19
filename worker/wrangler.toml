@@ -10,4 +10,4 @@ migrations_dir = "migrations"
 [[d1_databases]]
 binding = "DB"
 database_name = "ketsuin-leaderboard"
-database_id = "<replace-after-db-create>"
+database_id = "c1dee303-3f80-495d-a6ae-79e3ccbfbf5e"
