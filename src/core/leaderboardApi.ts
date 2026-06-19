@@ -24,7 +24,16 @@ interface ApiError extends Error {
 const API_URL = (import.meta.env.VITE_LEADERBOARD_API_URL || '').trim();
 
 export function isLeaderboardApiConfigured(): boolean {
-    return API_URL.startsWith('https://') || API_URL.startsWith('http://localhost');
+    const url = API_URL;
+    if (!url) return false;
+    try {
+        const parsed = new URL(url);
+        if (parsed.protocol === 'https:') return true;
+        if (parsed.protocol === 'http:' && parsed.hostname === 'localhost') return true;
+        return false;
+    } catch {
+        return false;
+    }
 }
 
 function apiUrl(path: string): string {
