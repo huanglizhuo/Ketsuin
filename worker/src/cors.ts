@@ -14,6 +14,7 @@ export function corsHeaders(origin: string): HeadersInit {
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Max-Age': '86400',
+        'Vary': 'Origin',
     };
 }
 
