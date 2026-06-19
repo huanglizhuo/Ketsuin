@@ -17,6 +17,9 @@ dist-ssr
 # Worktrees
 .worktrees/
 
+# Wrangler
+.wrangler/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
