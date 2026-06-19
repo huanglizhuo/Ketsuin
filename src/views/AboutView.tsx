@@ -41,7 +41,7 @@ export default function AboutView() {
                     <li><strong>ONNX Runtime Web</strong> — runs ML inference entirely in the browser via WebAssembly</li>
                     <li><strong>T9 Engine</strong> — predictive text input mapped to 12 ninja seals</li>
                     <li><strong>React 19 + TypeScript + Vite</strong> — modern web stack</li>
-                    <li><strong>Supabase</strong> — global leaderboard for challenge mode</li>
+                    <li><strong>Cloudflare Workers + D1</strong> — global leaderboard for challenge mode</li>
                 </ul>
                 <p className="mt-3 text-sm text-gray-400">
                     All detection happens locally in your browser. No video data is sent to any server.

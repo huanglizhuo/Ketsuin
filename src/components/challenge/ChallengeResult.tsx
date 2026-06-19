@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import type { ChallengeResult as ChallengeResultType } from '../../core/ChallengeEngine';
-import { submitScore, fetchPlayerRank } from '../../core/supabase';
+import { submitScore, fetchPlayerRank } from '../../core/leaderboardApi';
 import { buildShareText, buildShareUrl, shareToTwitter, copyToClipboard, copyImageToClipboard } from '../../core/share';
 import { captureElementAsImage } from './ShareCardRenderer';
 import { useI18n } from '../../i18n/I18nContext';

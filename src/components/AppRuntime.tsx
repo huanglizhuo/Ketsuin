@@ -9,7 +9,7 @@ import { SignManager } from '../core/SignManager';
 import { T9Engine } from '../core/T9Engine';
 
 // Challenge + Leaderboard ship as separate chunks — they pull in
-// Supabase + html2canvas which the default T9 view never needs.
+// the leaderboard API client + html2canvas which the default T9 view never needs.
 const ChallengeMode = lazy(() =>
     import('./challenge/ChallengeMode').then(m => ({ default: m.ChallengeMode }))
 );

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { SUPPORTED_JUTSUS, NINJA_RANKS } from '../../config/data';
 import type { NinjaRank } from '../../config/data';
-import { fetchLeaderboard, isSupabaseConfigured } from '../../core/supabase';
-import type { LeaderboardEntry } from '../../core/supabase';
+import { fetchLeaderboard, isLeaderboardApiConfigured } from '../../core/leaderboardApi';
+import type { LeaderboardEntry } from '../../core/leaderboardApi';
 import { useI18n } from '../../i18n/I18nContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -64,7 +64,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
 
             {/* Data source indicator */}
             <p className="text-xs text-gray-400 font-mono">
-                {isSupabaseConfigured() ? t('leaderboard.global') : t('leaderboard.local')}
+                {isLeaderboardApiConfigured() ? t('leaderboard.global') : t('leaderboard.local')}
             </p>
 
             {/* Jutsu Tabs */}

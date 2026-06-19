@@ -21,7 +21,7 @@ Ketsuin is a free, open-source web application that lets you type text using 12 
 - React 19, TypeScript, Vite 7, Tailwind CSS v4
 - ONNX Runtime Web (WASM) for ML inference
 - YOLOX-Nano model for hand sign detection
-- Supabase for leaderboard data
+- Cloudflare Workers + D1 for leaderboard data
 - Hosted on Vercel
 
 ## Links
