@@ -43,7 +43,6 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          GITHUB_PAGES: 'true'
           VITE_LEADERBOARD_API_URL: ${{ secrets.VITE_LEADERBOARD_API_URL }}
         
       - name: Setup Pages
