@@ -1,0 +1,21 @@
+{
+  "name": "ketsuin-leaderboard-worker",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create ketsuin-leaderboard",
+    "db:migrate:local": "wrangler d1 migrations apply ketsuin-leaderboard --local",
+    "db:migrate:prod": "wrangler d1 migrations apply ketsuin-leaderboard --remote"
+  },
+  "dependencies": {
+    "hono": "^4.7.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240620.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^3.114.0"
+  }
+}

@@ -1,0 +1,13 @@
+name = "ketsuin-leaderboard-worker"
+main = "src/index.ts"
+compatibility_date = "2024-06-20"
+
+[vars]
+ALLOWED_ORIGINS = "http://localhost:5173,https://huanglizhuo.github.io"
+
+migrations_dir = "migrations"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ketsuin-leaderboard"
+database_id = "<replace-after-db-create>"
