@@ -48,28 +48,36 @@ app.post('/api/leaderboard', async (c) => {
         return c.json({ error: 'Invalid JSON body' }, 400);
     }
 
+    const timeMs = Number(body.time_ms);
+    const signCount = Number(body.sign_count);
+
     const entry = {
         ninja_name: String(body.ninja_name || '').trim(),
         challenge_type: body.challenge_type === 'typing' ? 'typing' : 'jutsu',
         challenge_id: String(body.challenge_id || '').trim(),
-        time_ms: Number(body.time_ms),
-        sign_count: Number(body.sign_count),
+        time_ms: Number.isSafeInteger(timeMs) && timeMs > 0 ? timeMs : NaN,
+        sign_count: Number.isSafeInteger(signCount) && signCount > 0 ? signCount : NaN,
         rank_title: String(body.rank_title || '').trim(),
-        score: body.score === undefined ? null : Number(body.score),
-        accuracy: body.accuracy === undefined ? null : Number(body.accuracy),
+        score: body.score === undefined || body.score === null ? null : Number(body.score),
+        accuracy: body.accuracy === undefined || body.accuracy === null ? null : Number(body.accuracy),
     };
 
     entry.score = entry.score !== null && Number.isFinite(entry.score) ? entry.score : null;
     entry.accuracy = entry.accuracy !== null && Number.isFinite(entry.accuracy) ? entry.accuracy : null;
 
+    const MAX_NAME_LENGTH = 50;
+    const MAX_CHALLENGE_ID_LENGTH = 50;
+    const MAX_RANK_TITLE_LENGTH = 50;
+
     if (
         !entry.ninja_name ||
+        entry.ninja_name.length > MAX_NAME_LENGTH ||
         !entry.challenge_id ||
+        entry.challenge_id.length > MAX_CHALLENGE_ID_LENGTH ||
         !entry.rank_title ||
+        entry.rank_title.length > MAX_RANK_TITLE_LENGTH ||
         Number.isNaN(entry.time_ms) ||
-        entry.time_ms <= 0 ||
-        !Number.isFinite(entry.sign_count) ||
-        entry.sign_count <= 0
+        Number.isNaN(entry.sign_count)
     ) {
         return c.json({ error: 'Missing required fields' }, 400);
     }
