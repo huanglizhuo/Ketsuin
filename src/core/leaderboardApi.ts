@@ -21,10 +21,12 @@ interface ApiError extends Error {
 
 // --- Config ---
 
-const API_URL = (import.meta.env.VITE_LEADERBOARD_API_URL || '').trim();
+function getApiUrl(): string {
+    return (import.meta.env.VITE_LEADERBOARD_API_URL || '').trim();
+}
 
 export function isLeaderboardApiConfigured(): boolean {
-    const url = API_URL;
+    const url = getApiUrl();
     if (!url) return false;
     try {
         const parsed = new URL(url);
@@ -37,7 +39,7 @@ export function isLeaderboardApiConfigured(): boolean {
 }
 
 function apiUrl(path: string): string {
-    const base = API_URL.replace(/\/$/, '');
+    const base = getApiUrl().replace(/\/$/, '');
     return `${base}${path}`;
 }
 
