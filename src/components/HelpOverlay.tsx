@@ -177,7 +177,7 @@ export const HelpOverlay: React.FC<HelpOverlayProps> = ({ isOpen, onClose }) => 
                                 ].map((item) => (
                                     <div key={item.id} className="bg-white/5 rounded p-2 flex flex-col items-center border border-white/5 hover:border-konoha-orange/30 transition-colors">
                                         <img
-                                            src={`${import.meta.env.BASE_URL}asset/${item.sign}.png`}
+                                            src={`${import.meta.env.BASE_URL}asset/${item.sign}.webp`}
                                             alt={item.sign}
                                             loading="lazy"
                                             decoding="async"

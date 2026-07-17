@@ -44,7 +44,7 @@ function App() {
       {/* Background Image: Shinra Tensei */}
       <div aria-hidden="true" className="absolute inset-0 z-0 pointer-events-none">
         <img
-          src={`${import.meta.env.BASE_URL}asset/shinra.png`}
+          src={`${import.meta.env.BASE_URL}asset/shinra.webp`}
           alt=""
           loading="lazy"
           decoding="async"

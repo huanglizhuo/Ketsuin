@@ -3,11 +3,20 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="asset/ketsuin.png" />
-  <!-- Reggae One — Google Font for Japanese jutsu names -->
+  <link rel="icon" type="image/png" href="asset/ketsuin-64.png" />
+  <!-- Critical UI font: start the 719KB download immediately instead of waiting for CSS -->
+  <link rel="preload" href="/fonts/AaJianMingShouShu-2.woff2" as="font" type="font/woff2" crossorigin />
+  <!-- Warm up connections used after camera start: AI model + ONNX wasm -->
+  <link rel="preconnect" href="https://huanglizhuo.github.io" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <!-- Reggae One — Google Font for Japanese jutsu names (loaded non-render-blocking) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Reggae+One&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Reggae+One&display=swap" rel="stylesheet" media="print"
+    onload="this.media='all'" />
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Reggae+One&display=swap" rel="stylesheet" />
+  </noscript>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="canonical" href="https://ketsuin.clothpath.com/" />
 

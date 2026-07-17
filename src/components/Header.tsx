@@ -36,7 +36,7 @@ export const Header = memo(function Header({ onOpenHelp, onBeforeNavigate }: Hea
         <header className="px-6 py-3 bg-transparent flex flex-col shrink-0 sticky top-0 z-[120] relative">
             <div className="flex flex-col md:flex-row justify-between items-center relative gap-4 md:gap-0">
                 <div className="flex items-center gap-3">
-                    <img src={`${import.meta.env.BASE_URL}asset/ketsuin.png`} alt="Ketsuin Logo" className="w-10 h-10 object-contain drop-shadow-md" />
+                    <img src={`${import.meta.env.BASE_URL}asset/ketsuin-128.webp`} alt="Ketsuin Logo" width="40" height="40" className="w-10 h-10 object-contain drop-shadow-md" />
                     <h1 className="text-2xl md:text-3xl text-konoha-orange font-bold tracking-wider text-gray-100 font-ninja drop-shadow-md">
                         结印-KeTsuIn
                     </h1>

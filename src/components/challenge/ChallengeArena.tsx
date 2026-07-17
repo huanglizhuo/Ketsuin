@@ -114,7 +114,7 @@ export const ChallengeArena: React.FC<ChallengeArenaProps> = ({ state, children,
                             <div className={`w-32 h-32 md:w-48 md:h-48 relative transition-transform duration-200
                                 ${lastError ? 'scale-110' : 'scale-100'}`}>
                                 <img
-                                    src={`${import.meta.env.BASE_URL}asset/${currentSign.kanji}.png`}
+                                    src={`${import.meta.env.BASE_URL}asset/${currentSign.kanji}.webp`}
                                     alt={currentSign.name}
                                     decoding="async"
                                     className={`w-full h-full object-contain filter drop-shadow-chakra-md

@@ -31,7 +31,7 @@ export default function HandSignsView() {
                     return (
                         <div key={sign.id} className="bg-ink/80 border border-gray-800 rounded-lg p-4 flex gap-4 items-center">
                             <img
-                                src={`${import.meta.env.BASE_URL}asset/${sign.kanji}.png`}
+                                src={`${import.meta.env.BASE_URL}asset/${sign.kanji}.webp`}
                                 alt={`${sign.name} (${sign.kanji})`}
                                 loading="lazy"
                                 className="w-16 h-16 object-contain flex-shrink-0"
