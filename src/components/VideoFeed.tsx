@@ -3,6 +3,17 @@ import type { Detection } from '../core/yolox';
 import { HAND_SIGNS } from '../config/data';
 import { useI18n } from '../i18n/I18nContext';
 
+// Resolved lazily and cached — reading getComputedStyle on every detection
+// frame (10/s) forces style recalculation for no benefit.
+let cachedKonohaOrange: string | null = null;
+function getKonohaOrange(): string {
+    if (!cachedKonohaOrange) {
+        cachedKonohaOrange = getComputedStyle(document.documentElement)
+            .getPropertyValue('--color-konoha-orange').trim() || '#F2A900';
+    }
+    return cachedKonohaOrange;
+}
+
 interface VideoFeedProps {
     videoRef: React.RefObject<HTMLVideoElement | null>;
     detections: Detection[];
@@ -55,8 +66,7 @@ export const VideoFeed: React.FC<VideoFeedProps> = ({
             }
         }
 
-        const konohaOrange = getComputedStyle(document.documentElement)
-            .getPropertyValue('--color-konoha-orange').trim() || '#F2A900';
+        const konohaOrange = getKonohaOrange();
 
         detections.forEach(det => {
             const [x1, y1, x2, y2] = det.box;

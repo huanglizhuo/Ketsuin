@@ -46,7 +46,6 @@ function App() {
         <img
           src={`${import.meta.env.BASE_URL}asset/shinra.webp`}
           alt=""
-          loading="lazy"
           decoding="async"
           // @ts-expect-error — fetchpriority is valid HTML but not yet in React types
           fetchpriority="low"

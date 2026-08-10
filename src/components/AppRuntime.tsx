@@ -1,6 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import { useDetector } from '../hooks/useDetector';
+import { useDetector, warmupDetector } from '../hooks/useDetector';
 import { Header } from './Header';
 import { SignOverlay } from './SignOverlay';
 import { EasterEggOverlay } from './EasterEggOverlay';
@@ -47,6 +47,21 @@ export function AppRuntime({
 
     const t9EngineRef = useRef(new T9Engine());
     const [t9State, setT9State] = useState(t9EngineRef.current.getState());
+
+    // The 100KB T9 dictionary ships as its own chunk, fetched off the critical path
+    useEffect(() => {
+        let cancelled = false;
+        void import('../config/t9_dictionary').then(m => {
+            if (!cancelled) t9EngineRef.current.setDictionary(m.T9_DICTIONARY);
+        });
+        return () => { cancelled = true; };
+    }, []);
+
+    // Warm the detector chunk + model bytes during idle time so Start feels instant
+    useEffect(() => {
+        const idle = window.requestIdleCallback ?? ((cb: () => void) => { setTimeout(cb, 1500); return 0; });
+        idle(() => warmupDetector());
+    }, []);
     const [lastConfirmedSign, setLastConfirmedSign] = useState<number | null>(null);
     const [showEasterEgg, setShowEasterEgg] = useState(false);
 

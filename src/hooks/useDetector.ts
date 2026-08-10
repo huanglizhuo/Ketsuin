@@ -4,10 +4,31 @@ import type { YoloxDetector } from '../core/yolox';
 
 export type { Detection };
 
+const DEFAULT_MODEL_PATH = 'https://ketsuin.clothpath.com/model/yolox_nano.onnx';
+
+// Inference runs in a module worker when OffscreenCanvas is available, so
+// per-frame preprocessing + wasm inference never blocks the UI. Older
+// browsers (Safari < 16.4) fall back to main-thread inference.
+const supportsWorkerInference = typeof Worker !== 'undefined' && typeof OffscreenCanvas !== 'undefined';
+
+// Best-effort warm-up during idle time: pulls the yolox/ort chunk and warms
+// the 3.6MB model into Cache Storage, so pressing Start feels instant.
+export function warmupDetector(modelPath: string = DEFAULT_MODEL_PATH) {
+    const conn = (navigator as { connection?: { saveData?: boolean } }).connection;
+    if (conn?.saveData) return;
+    void (async () => {
+        try {
+            const { preloadModel } = await import('../core/yolox');
+            await preloadModel(modelPath);
+        } catch {
+            // Warm-up is best-effort — start() loads everything for real.
+        }
+    })();
+}
+
 // Updated implementation
 export function useDetector(
-    // Default to GitHub Pages CDN to save Vercel bandwidth
-    modelPath: string = 'https://huanglizhuo.github.io/Ketsuin/model/yolox_nano.onnx'
+    modelPath: string = DEFAULT_MODEL_PATH
 ) {
     const DETECTION_INTERVAL_MS = 100;
     const [loading, setLoading] = useState(false); // Not loading initially
@@ -15,6 +36,8 @@ export function useDetector(
     const [detections, setDetections] = useState<Detection[]>([]);
     const [error, setError] = useState<string | null>(null);
     const detectorRef = useRef<YoloxDetector | null>(null);
+    const workerRef = useRef<Worker | null>(null);
+    const workerPendingRef = useRef<{ resolve: (d: Detection[]) => void } | null>(null);
     const animationFrameRef = useRef<number>(0);
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const waitingForVideoRefRef = useRef(false);
@@ -32,9 +55,25 @@ export function useDetector(
         console.log('[useDetector]', message);
     }, []);
 
+    // Sends one frame to the inference worker when available, otherwise runs
+    // the detector on the main thread (fallback for browsers without OffscreenCanvas).
+    const detectWith = useCallback(async (video: HTMLVideoElement): Promise<Detection[]> => {
+        if (workerRef.current) {
+            const worker = workerRef.current;
+            const bitmap = await createImageBitmap(video);
+            return new Promise<Detection[]>((resolve) => {
+                workerPendingRef.current = { resolve };
+                worker.postMessage({ type: 'detect', bitmap }, [bitmap]);
+            });
+        }
+        if (!detectorRef.current) return [];
+        return detectorRef.current.detect(video);
+    }, []);
+
     // loop function remains the same
     const loop = useCallback(async function runLoop() {
-        if (!detectorRef.current || !isRunning) return;
+        if (!detectorRef.current && !workerRef.current) return;
+        if (!isRunning) return;
 
         if (!videoRef.current) {
             if (!waitingForVideoRefRef.current) {
@@ -62,7 +101,7 @@ export function useDetector(
         ) {
             try {
                 detectInFlightRef.current = true;
-                const dets = await detectorRef.current.detect(videoRef.current);
+                const dets = await detectWith(videoRef.current);
                 lastDetectionAtRef.current = performance.now();
                 setDetections(dets);
             } catch (e) {
@@ -77,7 +116,7 @@ export function useDetector(
                 void runLoop();
             });
         }
-    }, [isRunning, log]);
+    }, [isRunning, log, detectWith]);
 
     const start = useCallback(async () => {
         setError(null);
@@ -88,13 +127,35 @@ export function useDetector(
         });
 
         // 1. Lazy Load Model if not loaded
-        if (!detectorRef.current) {
+        if (!detectorRef.current && !workerRef.current) {
             setLoading(true);
             try {
-                const { YoloxDetector } = await import('../core/yolox');
-                const detector = new YoloxDetector();
-                await detector.load(modelPath);
-                detectorRef.current = detector;
+                if (supportsWorkerInference) {
+                    const worker = new Worker(
+                        new URL('../core/detector.worker.ts', import.meta.url),
+                        { type: 'module' }
+                    );
+                    await new Promise<void>((resolve, reject) => {
+                        worker.onmessage = (e: MessageEvent) => {
+                            if (e.data.type === 'init-done') resolve();
+                            else if (e.data.type === 'init-error') reject(new Error(e.data.error));
+                        };
+                        worker.postMessage({ type: 'init', modelPath });
+                    });
+                    // Switch to the steady-state handler for detection results
+                    worker.onmessage = (e: MessageEvent) => {
+                        if (e.data.type === 'result') {
+                            workerPendingRef.current?.resolve(e.data.detections);
+                            workerPendingRef.current = null;
+                        }
+                    };
+                    workerRef.current = worker;
+                } else {
+                    const { YoloxDetector } = await import('../core/yolox');
+                    const detector = new YoloxDetector();
+                    await detector.load(modelPath);
+                    detectorRef.current = detector;
+                }
             } catch (e) {
                 console.error("Initialization failed", e);
                 setError("Failed to load AI Model. Please refresh.");
@@ -102,7 +163,7 @@ export function useDetector(
                 return;
             }
             setLoading(false);
-            log('Detector loaded');
+            log('Detector loaded', { worker: supportsWorkerInference });
         }
 
         // 2. Start Camera
@@ -152,6 +213,9 @@ export function useDetector(
         waitingForVideoRefRef.current = false;
         detectInFlightRef.current = false;
         lastDetectionAtRef.current = 0;
+        // Unblock a detect promise still waiting on the worker
+        workerPendingRef.current?.resolve([]);
+        workerPendingRef.current = null;
 
         const streamsToStop = new Set<MediaStream>();
         if (mediaStreamRef.current) {

@@ -7,21 +7,72 @@ export interface Detection {
     box: [number, number, number, number]; // x1, y1, x2, y2
 }
 
+// The model host only sends Cache-Control: max-age=600 (GitHub Pages), so without
+// this every session re-downloads 3.6MB. Bump the cache name when the model changes.
+const MODEL_CACHE_NAME = 'ketsuin-model-v1';
+
+async function fetchModelBytes(modelPath: string): Promise<Uint8Array> {
+    if ('caches' in globalThis) {
+        try {
+            const cache = await caches.open(MODEL_CACHE_NAME);
+            const hit = await cache.match(modelPath);
+            if (hit) return new Uint8Array(await hit.arrayBuffer());
+        } catch (e) {
+            console.warn('Model cache read failed, fetching from network', e);
+        }
+    }
+
+    const resp = await fetch(modelPath);
+    if (!resp.ok) throw new Error(`Model fetch failed: ${resp.status}`);
+    const bytes = new Uint8Array(await resp.arrayBuffer());
+
+    if ('caches' in globalThis) {
+        try {
+            const cache = await caches.open(MODEL_CACHE_NAME);
+            await cache.put(modelPath, new Response(bytes));
+        } catch (e) {
+            console.warn('Model cache write failed', e);
+        }
+    }
+    return bytes;
+}
+
+// Warms the model bytes into Cache Storage without creating an inference
+// session, so the first camera start skips the 3.6MB download. Best-effort.
+export async function preloadModel(modelPath: string): Promise<void> {
+    try {
+        await fetchModelBytes(modelPath);
+    } catch {
+        // The real load() path reports its own errors.
+    }
+}
+
+export type DetectorImageSource = HTMLVideoElement | HTMLImageElement | HTMLCanvasElement | ImageBitmap;
+
 export class YoloxDetector {
     private session: ort.InferenceSession | null = null;
     private inputShape = CONFIG.INPUT_SHAPE;
 
     // Performance Optimization: Cache these
-    private preprocessCanvas: HTMLCanvasElement;
-    private preprocessCtx: CanvasRenderingContext2D;
+    private preprocessCanvas: HTMLCanvasElement | OffscreenCanvas;
+    private preprocessCtx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
     private grids: number[][] | null = null;
     private expandedStrides: number[] | null = null;
+    // Reused every frame — avoids allocating ~2MB per detection (~20MB/s GC churn at 10fps)
+    private inputBuffer: Float32Array;
 
     constructor() {
-        this.preprocessCanvas = document.createElement('canvas');
-        this.preprocessCanvas.width = this.inputShape;
-        this.preprocessCanvas.height = this.inputShape;
+        // OffscreenCanvas lets the same detector run inside a Web Worker,
+        // where there is no document.
+        if (typeof document !== 'undefined') {
+            this.preprocessCanvas = document.createElement('canvas');
+            this.preprocessCanvas.width = this.inputShape;
+            this.preprocessCanvas.height = this.inputShape;
+        } else {
+            this.preprocessCanvas = new OffscreenCanvas(this.inputShape, this.inputShape);
+        }
         this.preprocessCtx = this.preprocessCanvas.getContext('2d', { willReadFrequently: true })!;
+        this.inputBuffer = new Float32Array(3 * this.inputShape * this.inputShape);
     }
 
     async load(modelPath: string) {
@@ -30,8 +81,18 @@ export class YoloxDetector {
             // This saves ~25MB of bandwidth per user compared to serving from Vercel
             ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.23.2/dist/';
 
+            // Multi-threaded WASM needs cross-origin isolation (COOP/COEP, present on
+            // Vercel + dev server but not GitHub Pages). Fall back to single-thread
+            // where SharedArrayBuffer is unavailable.
+            ort.env.wasm.numThreads = crossOriginIsolated
+                ? Math.min(4, navigator.hardwareConcurrency || 1)
+                : 1;
+
+            // Cache Storage first (see fetchModelBytes), network as fallback
+            const modelBytes = await fetchModelBytes(modelPath);
+
             // Set to use wasm
-            this.session = await ort.InferenceSession.create(modelPath, {
+            this.session = await ort.InferenceSession.create(modelBytes, {
                 executionProviders: ['wasm'],
             });
             console.log('Model loaded successfully');
@@ -66,7 +127,7 @@ export class YoloxDetector {
         }
     }
 
-    async detect(imageSource: HTMLVideoElement | HTMLImageElement | HTMLCanvasElement): Promise<Detection[]> {
+    async detect(imageSource: DetectorImageSource): Promise<Detection[]> {
         if (!this.session) return [];
 
         const { inputTensor, padParams } = await this.preprocess(imageSource);
@@ -81,16 +142,18 @@ export class YoloxDetector {
         return detections;
     }
 
-    private async preprocess(image: HTMLVideoElement | HTMLImageElement | HTMLCanvasElement) {
+    private async preprocess(image: DetectorImageSource) {
         const ctx = this.preprocessCtx;
         if (!ctx) throw new Error('Could not get context');
 
         // Clear canvas
         ctx.clearRect(0, 0, this.inputShape, this.inputShape);
 
-        // Letterbox logic
-        const w = image instanceof HTMLVideoElement ? image.videoWidth : image.width;
-        const h = image instanceof HTMLVideoElement ? image.videoHeight : image.height;
+        // Letterbox logic. HTMLVideoElement doesn't exist inside workers —
+        // frames arrive there as ImageBitmap, which has plain width/height.
+        const isVideo = typeof HTMLVideoElement !== 'undefined' && image instanceof HTMLVideoElement;
+        const w = isVideo ? (image as HTMLVideoElement).videoWidth : image.width;
+        const h = isVideo ? (image as HTMLVideoElement).videoHeight : image.height;
 
         const scale = Math.min(this.inputShape / w, this.inputShape / h);
         const nw = Math.floor(w * scale);
@@ -106,7 +169,7 @@ export class YoloxDetector {
         const imageData = ctx.getImageData(0, 0, this.inputShape, this.inputShape);
         const { data } = imageData; // this is now optimized due to willReadFrequently: true
 
-        const input = new Float32Array(3 * this.inputShape * this.inputShape);
+        const input = this.inputBuffer;
 
         for (let i = 0; i < this.inputShape * this.inputShape; i++) {
             const r = data[i * 4];
@@ -142,11 +205,16 @@ export class YoloxDetector {
         for (let i = 0; i < numAnchors; i++) {
             const offset = i * numCols;
 
+            const boxScore = predictions[offset + 4];
+
+            // Reject before decoding — saves ~7000 Math.exp calls per frame
+            // on anchors that can never pass the threshold anyway.
+            if (boxScore < CONFIG.CONFIDENCE_THRESHOLD) continue;
+
             let x = predictions[offset + 0];
             let y = predictions[offset + 1];
             let w = predictions[offset + 2];
             let h = predictions[offset + 3];
-            const boxScore = predictions[offset + 4];
 
             // Decode
             const grid = grids[i];
@@ -156,8 +224,6 @@ export class YoloxDetector {
             y = (y + grid[1]) * currentStride;
             w = Math.exp(w) * currentStride; // exp
             h = Math.exp(h) * currentStride; // exp
-
-            if (boxScore < CONFIG.CONFIDENCE_THRESHOLD) continue;
 
             // Find max class score
             let maxClassScore = 0;

@@ -22,7 +22,8 @@ const KEYS = [
     { id: 12, label: 'NEXT', signId: 12, isFunc: true }, // Boar (#)
 ];
 
-export const T9Keyboard: React.FC<T9KeyboardProps & { className?: string }> = ({ activeSignId, className }) => {
+// memo: parent re-renders at detection rate (10fps) while props rarely change
+export const T9Keyboard = React.memo(function T9Keyboard({ activeSignId, className }: T9KeyboardProps & { className?: string }) {
 
     const getKeyLabel = (signId: number) => {
         const sign = HAND_SIGNS.find(s => s.id === signId);
@@ -80,4 +81,4 @@ export const T9Keyboard: React.FC<T9KeyboardProps & { className?: string }> = ({
             })}
         </div>
     );
-};
+});

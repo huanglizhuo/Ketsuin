@@ -1,5 +1,3 @@
-import { T9_DICTIONARY } from '../config/t9_dictionary';
-
 // Mapping from Key (Sign ID 1-12) to Letters/Function
 const T9_MAP: Record<number, string[]> = {
     1: ['.', ',', '?', '!', ':', ';', '1'], // Rat
@@ -17,6 +15,10 @@ const T9_MAP: Record<number, string[]> = {
 };
 
 export class T9Engine {
+    // Injected asynchronously via setDictionary — the 100KB dictionary ships as
+    // its own chunk, loaded off the critical path. Until it arrives, candidate
+    // lookup falls back to raw digits (see updateCandidates).
+    private dictionary: string[] = [];
     private currentSequence: string = ""; // e.g. "43556"
     private candidates: string[] = [];
     private candidateIndex: number = 0;
@@ -106,7 +108,7 @@ export class T9Engine {
         // FILTER: Find words that match the number sequence
         // We need a helper to convert words to T9 sequence to check match
         // Optimization: In a real app, use a Trie. Here, iterating list is fine for small PoC.
-        const matches = T9_DICTIONARY.filter(word => {
+        const matches = this.dictionary.filter(word => {
             const seq = this.wordToT9(word);
             return seq.startsWith(this.currentSequence);
         });
@@ -178,5 +180,10 @@ export class T9Engine {
     setText(text: string) {
         this.committedText = text;
         this.resetSequence();
+    }
+
+    // Inject the word list (loaded lazily as a separate chunk by the caller)
+    setDictionary(words: string[]) {
+        this.dictionary = words;
     }
 }

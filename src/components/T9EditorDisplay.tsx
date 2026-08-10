@@ -15,14 +15,16 @@ interface T9InputState {
     fullSignSequence?: number[]; // New prop from engine
 }
 
-export const T9EditorDisplay: React.FC<T9InputState> = ({
+// memo: parent re-renders at detection rate (10fps) while these props only
+// change on actual T9 engine events
+export const T9EditorDisplay = React.memo(function T9EditorDisplay({
     committedText,
     currentSequence,
     candidates,
     candidateIndex,
     onTextChange,
     fullSignSequence = []
-}) => {
+}: T9InputState) {
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
     const mirrorRef = React.useRef<HTMLDivElement>(null);
     const [selectionEnd, setSelectionEnd] = React.useState(0);
@@ -148,7 +150,7 @@ export const T9EditorDisplay: React.FC<T9InputState> = ({
             </div>
         </div>
     );
-};
+});
 
 // Legacy/Wrapper if needed, but App.tsx will likely use T9EditorDisplay directly.
 // Keeping this for backward compat if I missed an import update, but I'll update App.tsx next.
