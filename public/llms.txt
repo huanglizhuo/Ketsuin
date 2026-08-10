@@ -11,7 +11,7 @@ Ketsuin is a free, open-source web application that lets you type text using 12 
 - Real-time hand sign detection via webcam (YOLOX-Nano, ONNX Runtime WASM)
 - T9 predictive text input mapped to 12 ninja seals
 - Challenge mode: compete on jutsu sequences against global leaderboard
-- 9 jutsu challenges from Chidori (4 seals) to Water Dragon (44 seals)
+- 8 jutsu challenges from Chidori (4 seals) to Water Dragon (44 seals)
 - Ninja ranking system: Genin through Six Paths
 - Three languages: English, Chinese (中文), Japanese (日本語)
 - Works entirely in-browser, no server-side processing for detection
@@ -22,9 +22,11 @@ Ketsuin is a free, open-source web application that lets you type text using 12 
 - ONNX Runtime Web (WASM) for ML inference
 - YOLOX-Nano model for hand sign detection
 - Cloudflare Workers + D1 for leaderboard data
-- Hosted on Vercel
+- Hosted on GitHub Pages
 
 ## Links
 
 - Website: https://ketsuin.clothpath.com/
+- About: https://ketsuin.clothpath.com/about
+- Hand Signs Reference: https://ketsuin.clothpath.com/hand-signs
 - Source: https://github.com/huanglizhuo/Ketsuin

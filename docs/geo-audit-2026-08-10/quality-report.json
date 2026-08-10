@@ -1,0 +1,49 @@
+{
+  "skill_id": "yao-geo-page-audit",
+  "site": "ketsuin.clothpath.com",
+  "checked_at": "2026-08-10",
+  "artifact_schema_version": 4,
+  "artifacts": [
+    {
+      "format": "markdown",
+      "file": "ketsuin-geo-page-audit.md",
+      "exists": true,
+      "bytes": 17679
+    },
+    {
+      "format": "html",
+      "file": "ketsuin-geo-page-audit.html",
+      "exists": true,
+      "bytes": 25575
+    },
+    {
+      "format": "word",
+      "file": "ketsuin-geo-page-audit.docx",
+      "exists": true,
+      "bytes": 48788
+    },
+    {
+      "format": "pdf",
+      "file": "ketsuin-geo-page-audit.pdf",
+      "exists": true,
+      "bytes": 841965
+    }
+  ],
+  "layout_checks": {
+    "markdown_wide_table_lines_gt5": [],
+    "html_has_toc": true,
+    "html_has_sticky_or_fixed_toc": true,
+    "html_has_kami_parchment_rule": true,
+    "html_has_ink_blue_accent": true,
+    "html_has_no_rgba": true,
+    "html_has_compact_body_line_height": true,
+    "docx_max_table_columns": 5,
+    "docx_visible_url_tokens_gt40": [],
+    "docx_zip_ok": true,
+    "pdf_pdftoppm_available": true,
+    "pdf_rendered_png_pages_checked": true,
+    "pdf_rendered_pages": 8,
+    "pdf_right_edge_issues": []
+  },
+  "open_issues": []
+}

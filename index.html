@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="asset/ketsuin-64.png" />
+  <link rel="icon" type="image/png" href="/asset/ketsuin-64.png" />
   <!-- Critical UI font: start the 719KB download immediately instead of waiting for CSS -->
   <link rel="preload" href="/fonts/AaJianMingShouShu-2.woff2" as="font" type="font/woff2" crossorigin />
   <!-- Warm up connections used after camera start: AI model (cross-origin in dev) + ONNX wasm -->
@@ -65,10 +65,42 @@
           "priceCurrency": "USD"
         },
         "description": "A web-based input method that uses AI to detect ninja hand signs via webcam and converts them to text using T9 logic.",
+        "codeRepository": "https://github.com/huanglizhuo/Ketsuin",
+        "sameAs": ["https://github.com/huanglizhuo/Ketsuin"],
         "author": {
           "@type": "Person",
           "name": "Huang Lizhuo"
         }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Do I need a webcam?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, for hand sign detection mode. You can also use keyboard keys 1-9 as an alternative input method."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What technology does it use?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "YOLOX-Nano for hand sign detection, ONNX Runtime WebAssembly for inference in the browser, and a T9 engine for predictive text input. No data leaves your device."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is it free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, completely free and open source."
+            }
+          }
+        ]
       },
       {
         "@context": "https://schema.org",
