@@ -35,10 +35,9 @@ jobs:
 
       - name: Restore Assets for GH Pages
         run: |
-          mkdir -p public/fonts public/model public/onnx
+          mkdir -p public/fonts public/model
           cp -r unused_assets/fonts/* public/fonts/
           cp -r unused_assets/model/* public/model/
-          cp -r unused_assets/onnx/* public/onnx/
 
       - name: Build
         run: npm run build
