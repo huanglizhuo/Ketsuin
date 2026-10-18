@@ -4,6 +4,8 @@
 
 # 结印 Ketsuin - Ninja Hand Sign Input
 
+[![OctoCounts](https://api.octocounts.com/badge/huanglizhuo/Ketsuin/branch/main)](https://octocounts.com/?q=https%3A%2F%2Fgithub.com%2Fhuanglizhuo%2FKetsuin&ref=main)
+
 [中文文档](README_zh.md)
 
 **Ketsuin** invokes the ancient art of **Ninjutsu** to manipulate the digital realm. Forget your physical keyboard， channel your chakra and weave the **12 Hand Signs** (based on Naruto seals) to conjure text.
